@@ -1,17 +1,19 @@
-
 package com.mycompany.sistemacreditos;
+
+import javax.swing.JTable;
 
 public class FormPrincipal extends javax.swing.JFrame {
 
- 
+
     public FormPrincipal() {
         initComponents();
         setSize(800, 480);
         setResizable(false);
         setLocationRelativeTo(null);
+        Clientes objetoClientes = new Clientes();
+        objetoClientes.MostrarClientes(tablaClientes);
     }
 
- 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -83,37 +85,36 @@ public class FormPrincipal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void crearClienteBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_crearClienteBtnActionPerformed
-      FormCrearCliente nuevaVentana = new FormCrearCliente();
-      nuevaVentana.setVisible(true);      
+        FormCrearCliente nuevaVentana = new FormCrearCliente();
+        nuevaVentana.setVisible(true);
     }//GEN-LAST:event_crearClienteBtnActionPerformed
 
     private void cobrarCuotaBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cobrarCuotaBtnActionPerformed
-      FormCobrarCuota cobrarCuota = new FormCobrarCuota();
-      cobrarCuota.setVisible(true);  
+        FormCobrarCuota cobrarCuota = new FormCobrarCuota();
+        cobrarCuota.setVisible(true);
     }//GEN-LAST:event_cobrarCuotaBtnActionPerformed
 
     private void listadoClientesBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_listadoClientesBtnActionPerformed
-      FormListadoClientes listadoClientes = new FormListadoClientes();
-      listadoClientes.setVisible(true);  
+        FormListadoClientes listadoClientes = new FormListadoClientes();
+        listadoClientes.setVisible(true);
     }//GEN-LAST:event_listadoClientesBtnActionPerformed
 
     private void calculadoraBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_calculadoraBtnActionPerformed
-      FormCalculadora calculadora = new FormCalculadora();
-      calculadora.setVisible(true);
+        FormCalculadora calculadora = new FormCalculadora();
+        calculadora.setVisible(true);
     }//GEN-LAST:event_calculadoraBtnActionPerformed
 
     private void generarCreditoBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generarCreditoBtnActionPerformed
-      FormGenerarCredito generarCredito = new FormGenerarCredito();
-      generarCredito.setVisible(true);
+        FormGenerarCredito generarCredito = new FormGenerarCredito();
+        generarCredito.setVisible(true);
     }//GEN-LAST:event_generarCreditoBtnActionPerformed
 
     private void salirBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_salirBtnActionPerformed
         System.exit(0);
     }//GEN-LAST:event_salirBtnActionPerformed
 
-   
     public static void main(String args[]) {
-     
+
         java.awt.EventQueue.invokeLater(() -> {
             new FormPrincipal().setVisible(true);
         });
