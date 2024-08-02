@@ -49,6 +49,7 @@ public class Clientes {
             tablaClientes.setModel(modelo);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Error al mostrar los datos "+ e);
+            System.out.println(e);
         }
         finally{
             objetoConexion.cerrarConexion();

@@ -8,7 +8,7 @@ import javax.swing.JOptionPane;
 public class Conexion {
  Connection conectar = null;
  
- String bd = "BDUsuarios";
+ String bd = "BDUsuarios.db";
  String cadena = "jdbc:sqlite:"+ System.getProperty("user.dir")+"/"+bd;
  
  public Connection establecerConexion () {

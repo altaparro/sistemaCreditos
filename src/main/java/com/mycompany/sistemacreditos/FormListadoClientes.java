@@ -13,6 +13,8 @@ public class FormListadoClientes extends javax.swing.JFrame {
         initComponents();
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
+        Clientes objetoClientes = new Clientes();
+        objetoClientes.MostrarClientes(tablaClientes);
     }
 
     @SuppressWarnings("unchecked")

@@ -10,8 +10,6 @@ public class FormPrincipal extends javax.swing.JFrame {
         setSize(800, 480);
         setResizable(false);
         setLocationRelativeTo(null);
-        Clientes objetoClientes = new Clientes();
-        objetoClientes.MostrarClientes(tablaClientes);
     }
 
     @SuppressWarnings("unchecked")
