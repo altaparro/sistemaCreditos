@@ -1,10 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
+
 package com.mycompany.sistemacreditos;
 
 import javax.swing.JFrame;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class FormCrearCliente extends javax.swing.JFrame {
 
@@ -126,7 +125,11 @@ public class FormCrearCliente extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void confirmarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmarBtnActionPerformed
-        // TODO add your handling code here:
+        Clientes objetoCliente = new Clientes();
+         LocalDate fechaActual = LocalDate.now();
+         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+         String fecha_alta = fechaActual.format(formatter);
+        objetoCliente.InsertarCliente(dniTxt, nombresTxt, apellidoTxt, localidadTxt, barrioTxt, calleTxt, numeroTxt, entreCallesTxt, emailTxt, fecha_alta, 10);
     }//GEN-LAST:event_confirmarBtnActionPerformed
 
 
