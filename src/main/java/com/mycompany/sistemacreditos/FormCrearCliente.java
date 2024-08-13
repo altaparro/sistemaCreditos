@@ -156,7 +156,7 @@ public class FormCrearCliente extends javax.swing.JFrame {
          LocalDate fechaActual = LocalDate.now();
          DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
          String fecha_alta = fechaActual.format(formatter);
-        objetoCliente.InsertarCliente(dniTxt, nombresTxt, apellidoTxt, localidadTxt, barrioTxt, calleTxt, numeroTxt, entreCallesTxt, emailTxt, fecha_alta, 10, telefonoTxt, telefono2Txt, telefono3Txt, cod1Txt, cod2Txt, cod3Txt);
+        objetoCliente.InsertarCliente(dniTxt, nombresTxt, apellidoTxt, localidadTxt, barrioTxt, calleTxt, numeroTxt, entreCallesTxt, emailTxt, fecha_alta, 10, cod1Txt, telefonoTxt, cod2Txt, telefono2Txt, cod3Txt, telefono3Txt);
     }//GEN-LAST:event_confirmarBtnActionPerformed
 
     private void cod1TxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cod1TxtActionPerformed
