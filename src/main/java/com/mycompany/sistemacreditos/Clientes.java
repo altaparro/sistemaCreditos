@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.sistemacreditos;
 
 import java.sql.PreparedStatement;
@@ -12,17 +8,13 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
-/**
- *
- * @author matias
- */
 public class Clientes {
-    
-    public void MostrarClientes(JTable tablaClientes){
+
+    public void MostrarClientes(JTable tablaClientes) {
         Conexion objetoConexion = new Conexion();
-        
+
         DefaultTableModel modelo = new DefaultTableModel();
-        
+
         String sql = "";
         modelo.addColumn("ID");
         modelo.addColumn("DNI");
@@ -36,71 +28,100 @@ public class Clientes {
         modelo.addColumn("EMAIL                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ");
         modelo.addColumn("FECHA ALTA");
         modelo.addColumn("CALIFICACION");
-        
+
         tablaClientes.setModel(modelo);
-        
-        sql="SELECT * FROM clientes";
-        
+
+        sql = "SELECT * FROM clientes";
+
         String[] datos = new String[12];
         Statement st;
         try {
-            st= objetoConexion.establecerConexion().createStatement();
+            st = objetoConexion.establecerConexion().createStatement();
             ResultSet rs = st.executeQuery(sql);
-            
-            while(rs.next()){
-                
-                datos[0]= rs.getString(1);
-                datos[1]= rs.getString(2);
-                datos[2]= rs.getString(3);
-                datos[3]= rs.getString(4); 
-                datos[4]= rs.getString(5); 
-                datos[5]= rs.getString(6); 
-                datos[6]= rs.getString(7); 
-                datos[7]= rs.getString(8); 
-                datos[8]= rs.getString(9); 
-                datos[9]= rs.getString(10); 
-                datos[10]= rs.getString(11); 
-                datos[11]= rs.getString(12); 
+
+            while (rs.next()) {
+
+                datos[0] = rs.getString(1);
+                datos[1] = rs.getString(2);
+                datos[2] = rs.getString(3);
+                datos[3] = rs.getString(4);
+                datos[4] = rs.getString(5);
+                datos[5] = rs.getString(6);
+                datos[6] = rs.getString(7);
+                datos[7] = rs.getString(8);
+                datos[8] = rs.getString(9);
+                datos[9] = rs.getString(10);
+                datos[10] = rs.getString(11);
+                datos[11] = rs.getString(12);
                 modelo.addRow(datos);
             }
             tablaClientes.setModel(modelo);
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Error al mostrar los datos "+ e);
+            JOptionPane.showMessageDialog(null, "Error al mostrar los datos " + e);
             System.out.println(e);
-        }
-        finally{
+        } finally {
             objetoConexion.cerrarConexion();
         }
-                
+
     }
+
+   public void InsertarCliente(JTextField dni, JTextField nombres, JTextField apellidos, JTextField localidad, JTextField barrio, JTextField calle, JTextField numero, JTextField entre_calles, JTextField email, String fecha_alta, int calificacion, JTextField cod_area1, JTextField numero1, JTextField cod_area2, JTextField numero2, JTextField cod_area3, JTextField numero3) {
+    Conexion objetoConexion = new Conexion();
+    String consultaCliente = "INSERT INTO clientes(dni, nombres, apellidos, localidad, barrio, calle, numero, entre_calles, email, fecha_alta, calificacion) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+    String consultaTelefono = "INSERT INTO telefonos(id_cliente, cod_area, numero) VALUES (?,?,?)";
     
-        public void InsertarCliente(JTextField dni, JTextField nombres, JTextField apellidos, JTextField localidad, JTextField barrio, JTextField calle, JTextField numero, JTextField entre_calles, JTextField email, String fecha_alta, int calificacion){
-            Conexion objetoConexion = new Conexion();
+    try {
+        // Insertar el cliente
+        PreparedStatement psCliente = objetoConexion.establecerConexion().prepareStatement(consultaCliente, Statement.RETURN_GENERATED_KEYS);
+        psCliente.setString(1, dni.getText());
+        psCliente.setString(2, nombres.getText());
+        psCliente.setString(3, apellidos.getText());
+        psCliente.setString(4, localidad.getText());
+        psCliente.setString(5, barrio.getText());
+        psCliente.setString(6, calle.getText());
+        psCliente.setString(7, numero.getText());
+        psCliente.setString(8, entre_calles.getText());
+        psCliente.setString(9, email.getText());
+        psCliente.setString(10, fecha_alta);
+        psCliente.setInt(11, calificacion);
+        
+        psCliente.executeUpdate();
+        
+        // Obtener el ID del cliente insertado
+        ResultSet rs = psCliente.getGeneratedKeys();
+        if (rs.next()) {
+            int idCliente = rs.getInt(1);
             
-            String consulta = "insert into clientes(dni, nombres, apellidos, localidad, barrio, calle, numero, entre_calles, email, fecha_alta, calificacion) values (?,?,?,?,?,?,?,?,?,?,?)";
-             
-            try {
-                 PreparedStatement ps = objetoConexion.establecerConexion().prepareStatement(consulta);
-                 ps.setString(1, dni.getText());
-                 ps.setString(2, nombres.getText());
-                 ps.setString(3, apellidos.getText());
-                 ps.setString(4, localidad.getText());
-                 ps.setString(5, barrio.getText());
-                 ps.setString(6, calle.getText());
-                 ps.setString(7, numero.getText());
-                 ps.setString(8, entre_calles.getText());
-                 ps.setString(9, email.getText());
-                 ps.setString(10, fecha_alta);
-                 ps.setInt(11, calificacion);
-                 
-                 ps.execute();
-                 
-                 JOptionPane.showMessageDialog(null, "Se guardo correctamente el cliente");
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, "No se guardo el cliente"+ e.toString());
-            } finally{
-                objetoConexion.cerrarConexion();
-            }
+            // Insertar los números de teléfono
+            PreparedStatement psTelefono = objetoConexion.establecerConexion().prepareStatement(consultaTelefono);
+            
+            // Teléfono 1
+            psTelefono.setInt(1, idCliente);
+            psTelefono.setString(2, cod_area1.getText());
+            psTelefono.setString(3, numero1.getText());
+            psTelefono.addBatch();
+            
+            // Teléfono 2
+            psTelefono.setInt(1, idCliente);
+            psTelefono.setString(2, cod_area2.getText());
+            psTelefono.setString(3, numero2.getText());
+            psTelefono.addBatch();
+            
+            // Teléfono 3
+            psTelefono.setInt(1, idCliente);
+            psTelefono.setString(2, cod_area3.getText());
+            psTelefono.setString(3, numero3.getText());
+            psTelefono.addBatch();
+            
+            psTelefono.executeBatch();
         }
-    
+        
+        JOptionPane.showMessageDialog(null, "Cliente y teléfonos guardados correctamente");
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(null, "No se pudo guardar el cliente: " + e.toString());
+    } finally {
+        objetoConexion.cerrarConexion();
+    }
+}
+
 }
