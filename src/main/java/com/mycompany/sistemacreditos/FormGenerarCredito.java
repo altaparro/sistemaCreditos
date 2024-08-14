@@ -4,6 +4,8 @@
  */
 package com.mycompany.sistemacreditos;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import javax.swing.JFrame;
 
 public class FormGenerarCredito extends javax.swing.JFrame {
@@ -64,6 +66,11 @@ public class FormGenerarCredito extends javax.swing.JFrame {
         jLabel8.setText("MONTO:");
 
         jButton2.setText("GENERAR CREDITO");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -150,6 +157,14 @@ public class FormGenerarCredito extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+         Creditos objetoCreditos = new Creditos();
+         LocalDate fechaActual = LocalDate.now();
+         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+         String fecha = fechaActual.format(formatter);
+        objetoCreditos.InsertarCredito(dniTxt, observacionesText, montoTxt, fecha);
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     public static void main(String args[]) {
 
