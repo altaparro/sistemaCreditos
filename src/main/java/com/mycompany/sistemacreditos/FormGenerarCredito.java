@@ -166,10 +166,20 @@ public class FormGenerarCredito extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         Creditos objetoCreditos = new Creditos();
-        LocalDate fechaActual = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        String fecha = fechaActual.format(formatter);
-        objetoCreditos.InsertarCredito(dniTxt, observacionesText, montoTxt, fecha);
+    LocalDate fechaActual = LocalDate.now();
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    String fecha = fechaActual.format(formatter);
+
+    // Obtener el ítem seleccionado del combo box
+    String seleccion = (String) planPagoComboBox.getSelectedItem();
+    
+    // Extraer el id_plan_pago
+    int idPlanPago = Integer.parseInt(seleccion.split(" - ")[0]);
+
+    System.out.println("ID del plan de pago encontrado: " + idPlanPago);
+
+    // Ahora puedes usar el ID del plan de pago para guardarlo en la base de datos junto con el crédito
+    objetoCreditos.InsertarCredito(dniTxt, observacionesText, montoTxt, fecha, idPlanPago);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
