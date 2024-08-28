@@ -23,6 +23,7 @@ public class FormPrincipal extends javax.swing.JFrame {
         calculadoraBtn = new javax.swing.JButton();
         salirBtn = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
+        deudoresBtn = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -79,6 +80,9 @@ public class FormPrincipal extends javax.swing.JFrame {
         jLabel1.setText("SISTEMA CREDITOS - DEPORTES 7");
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 40, -1, -1));
 
+        deudoresBtn.setText("DEUDORES");
+        getContentPane().add(deudoresBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 240, 140, 60));
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
@@ -122,6 +126,7 @@ public class FormPrincipal extends javax.swing.JFrame {
     private javax.swing.JButton calculadoraBtn;
     private javax.swing.JButton cobrarCuotaBtn;
     private javax.swing.JButton crearClienteBtn;
+    private javax.swing.JButton deudoresBtn;
     private javax.swing.JButton generarCreditoBtn;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton listadoClientesBtn;
