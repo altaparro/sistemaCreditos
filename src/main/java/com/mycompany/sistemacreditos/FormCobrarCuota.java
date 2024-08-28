@@ -1,4 +1,3 @@
-
 package com.mycompany.sistemacreditos;
 
 import javax.swing.JFrame;
@@ -38,7 +37,7 @@ public class FormCobrarCuota extends javax.swing.JFrame {
                 {null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "id credito", "id cuota", "importe cuota", "importe actualizado"
             }
         ));
         jScrollPane1.setViewportView(jTable1);
@@ -53,6 +52,11 @@ public class FormCobrarCuota extends javax.swing.JFrame {
         });
 
         buscarBtn.setText("BUSCAR");
+        buscarBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buscarBtnActionPerformed(evt);
+            }
+        });
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel2.setText("DATOS CLIENTE:");
@@ -130,6 +134,13 @@ public class FormCobrarCuota extends javax.swing.JFrame {
     private void buscarTxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscarTxtActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_buscarTxtActionPerformed
+
+    private void buscarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscarBtnActionPerformed
+        Creditos objetoCreditos = new Creditos();
+        CobrarCuota objetoCobrarCuota = new CobrarCuota();
+        objetoCreditos.MostrarCliente(buscarTxt, dniTxt, nombresTxt, apellidoTxt);
+        objetoCobrarCuota.MostrarCuotasCliente(buscarTxt, jTable1);
+    }//GEN-LAST:event_buscarBtnActionPerformed
 
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {

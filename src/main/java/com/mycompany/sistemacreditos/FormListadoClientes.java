@@ -2,6 +2,7 @@
 package com.mycompany.sistemacreditos;
 
 import javax.swing.JFrame;
+import javax.swing.table.DefaultTableModel;
 
 public class FormListadoClientes extends javax.swing.JFrame {
 
