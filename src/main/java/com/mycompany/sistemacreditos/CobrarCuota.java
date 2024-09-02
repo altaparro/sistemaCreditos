@@ -66,5 +66,62 @@ public class CobrarCuota {
             }
         }
     }
+    
+public void procesarPago(Integer idCuota, Double montoPago) {
+    Conexion objetoConexion = new Conexion();
+    Connection conexion = null;
+    PreparedStatement pstmtActualizarRecargo = null;
+    PreparedStatement pstmtInsertarPago = null;
+
+    try {
+        conexion = objetoConexion.establecerConexion();
+        conexion.setAutoCommit(false); // Comenzar la transacción
+
+        String sqlActualizarRecargo = "UPDATE cuotas SET recargo = recargo - ? WHERE id_cuota = ?";
+        pstmtActualizarRecargo = conexion.prepareStatement(sqlActualizarRecargo);
+
+        String sqlInsertarPago = "INSERT INTO pagos (id_cuota, monto) VALUES (?, ?)";
+        pstmtInsertarPago = conexion.prepareStatement(sqlInsertarPago);
+
+        // Actualizar el recargo de la cuota
+        pstmtActualizarRecargo.setDouble(1, montoPago);
+        pstmtActualizarRecargo.setInt(2, idCuota);
+        pstmtActualizarRecargo.executeUpdate();
+
+        // Insertar el pago
+        pstmtInsertarPago.setInt(1, idCuota);
+        pstmtInsertarPago.setDouble(2, montoPago);
+        pstmtInsertarPago.executeUpdate();
+
+        conexion.commit(); // Confirmar la transacción
+    } catch (SQLException e) {
+        try {
+            if (conexion != null) {
+                conexion.rollback(); // Revertir la transacción en caso de error
+            }
+        } catch (SQLException rollbackEx) {
+            rollbackEx.printStackTrace();
+        }
+        e.printStackTrace();
+        javax.swing.JOptionPane.showMessageDialog(null, "Error al procesar el pago: " + e.getMessage());
+    } finally {
+        try {
+            if (pstmtActualizarRecargo != null) {
+                pstmtActualizarRecargo.close();
+            }
+            if (pstmtInsertarPago != null) {
+                pstmtInsertarPago.close();
+            }
+            if (conexion != null) {
+                conexion.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+
 
 }
