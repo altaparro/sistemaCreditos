@@ -4,6 +4,7 @@ import java.awt.Component;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -281,29 +282,70 @@ public class FormCobrarCuota extends javax.swing.JFrame {
         CobrarCuota objetoCobrarCuota = new CobrarCuota();
         objetoCreditos.MostrarCliente(buscarTxt, dniTxt, nombresTxt, apellidoTxt);
         objetoCobrarCuota.MostrarCuotasCliente(buscarTxt, jTable1);
+        updateTotalCobrar();
     }//GEN-LAST:event_buscarBtnActionPerformed
 
     private void cobrarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cobrarBtnActionPerformed
-
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+ DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         CobrarCuota objetoCobrarCuota = new CobrarCuota();
+        boolean algunPagoProcesado = false;
 
         for (int i = 0; i < model.getRowCount(); i++) {
-            Object pagoTotalObj = model.getValueAt(i, 4); // Columna del CheckBox
-            Boolean pagoTotal = (pagoTotalObj != null && pagoTotalObj instanceof Boolean) ? (Boolean) pagoTotalObj : false;
+            Object pagoTotalObj = model.getValueAt(i, 4);
+            boolean pagoTotal = pagoTotalObj instanceof Boolean && (Boolean) pagoTotalObj;
 
             Double montoPago = 0.0;
             if (pagoTotal) {
-                montoPago = (model.getValueAt(i, 3) instanceof Double) ? (Double) model.getValueAt(i, 3) : 0.0; // Monto total
+                Object importeActualizadoObj = model.getValueAt(i, 3);
+                if (importeActualizadoObj instanceof Number) {
+                    montoPago = ((Number) importeActualizadoObj).doubleValue();
+                } else if (importeActualizadoObj instanceof String) {
+                    try {
+                        montoPago = Double.parseDouble((String) importeActualizadoObj);
+                    } catch (NumberFormatException ex) {
+                        System.err.println("Error al parsear el importe actualizado: " + ex.getMessage());
+                        continue;
+                    }
+                }
             } else {
-                montoPago = (model.getValueAt(i, 5) instanceof Double) ? (Double) model.getValueAt(i, 5) : 0.0; // Monto parcial
+                Object pagoParcialObj = model.getValueAt(i, 5);
+                if (pagoParcialObj instanceof Number) {
+                    montoPago = ((Number) pagoParcialObj).doubleValue();
+                } else if (pagoParcialObj instanceof String) {
+                    try {
+                        montoPago = Double.parseDouble((String) pagoParcialObj);
+                    } catch (NumberFormatException ex) {
+                        System.err.println("Error al parsear el pago parcial: " + ex.getMessage());
+                        continue;
+                    }
+                }
             }
 
-            Integer idCuota = (model.getValueAt(i, 1) instanceof Integer) ? (Integer) model.getValueAt(i, 1) : null;
+            Object idCuotaObj = model.getValueAt(i, 1);
+            Integer idCuota = null;
+            if (idCuotaObj instanceof Number) {
+                idCuota = ((Number) idCuotaObj).intValue();
+            } else if (idCuotaObj instanceof String) {
+                try {
+                    idCuota = Integer.parseInt((String) idCuotaObj);
+                } catch (NumberFormatException ex) {
+                    System.err.println("Error al parsear el ID de la cuota: " + ex.getMessage());
+                    continue;
+                }
+            }
 
             if (montoPago > 0 && idCuota != null) {
                 objetoCobrarCuota.procesarPago(idCuota, montoPago);
+                algunPagoProcesado = true;
             }
+        }
+
+        if (algunPagoProcesado) {
+            buscarBtnActionPerformed(null);
+            updateTotalCobrar();
+            JOptionPane.showMessageDialog(this, "Pagos procesados con éxito.");
+        } else {
+            JOptionPane.showMessageDialog(this, "No se seleccionó ningún pago para procesar.");
         }
     }//GEN-LAST:event_cobrarBtnActionPerformed
 
