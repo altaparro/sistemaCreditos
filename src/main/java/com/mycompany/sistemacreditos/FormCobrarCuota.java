@@ -7,71 +7,112 @@ import javax.swing.JFrame;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
 public class FormCobrarCuota extends javax.swing.JFrame {
 
-public FormCobrarCuota() {
-    initComponents();
-    setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    setLocationRelativeTo(null);
-    
-    // Configuración para la columna de CheckBox (5ta columna en el índice 4)
-    int checkboxColumnIndex = 4; // Índice de la columna del CheckBox (5ta columna)
-    TableColumn checkboxColumn = jTable1.getColumnModel().getColumn(checkboxColumnIndex);
-    checkboxColumn.setCellEditor(new DefaultCellEditor(new JCheckBox()));
-    checkboxColumn.setCellRenderer(new DefaultTableCellRenderer() {
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            JCheckBox checkbox = new JCheckBox();
-            if (value != null && value instanceof Boolean) {
-                checkbox.setSelected((Boolean) value);
-            } else {
-                checkbox.setSelected(false); // Valor predeterminado si es null
-            }
-            checkbox.setHorizontalAlignment(SwingConstants.CENTER);
-            return checkbox;
-        }
-    });
+    public FormCobrarCuota() {
+        initComponents();
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
 
-    // Configuración para la columna de Pago Parcial (6ta columna en el índice 5)
-    int partialPaymentColumnIndex = 5; // Índice de la columna de Pago Parcial (6ta columna)
-    TableColumn partialPaymentColumn = jTable1.getColumnModel().getColumn(partialPaymentColumnIndex);
-    partialPaymentColumn.setCellEditor(new DefaultCellEditor(new JTextField()) {
-        @Override
-        public Object getCellEditorValue() {
-            String text = (String) super.getCellEditorValue();
-            try {
-                return Double.parseDouble(text);
-            } catch (NumberFormatException e) {
-                return 0.0; // Valor predeterminado en caso de error
-            }
-        }
-    });
-    partialPaymentColumn.setCellRenderer(new DefaultTableCellRenderer() {
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            JTextField textField = new JTextField();
-            if (value != null && value instanceof Double) {
-                textField.setText(String.format("%.2f", (Double) value));
-            } else {
-                textField.setText(""); // Valor predeterminado si es null
-            }
-            textField.setHorizontalAlignment(SwingConstants.RIGHT);
-            return textField;
-        }
-    });
-}
+        // Configuración de la tabla
+        configurarTabla();
 
+        // Agregar el TableModelListener
+        jTable1.getModel().addTableModelListener(e -> {
+            if (e.getColumn() == 4 || e.getColumn() == 5) { // Columnas de pago total y parcial
+                updateTotalCobrar();
+            }
+        });
+    }
+
+    private void configurarTabla() {
+        // Configuración para la columna de CheckBox (5ta columna en el índice 4)
+        int checkboxColumnIndex = 4;
+        TableColumn checkboxColumn = jTable1.getColumnModel().getColumn(checkboxColumnIndex);
+        checkboxColumn.setCellEditor(new DefaultCellEditor(new JCheckBox()));
+        checkboxColumn.setCellRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JCheckBox checkbox = new JCheckBox();
+                checkbox.setSelected(value != null && value instanceof Boolean && (Boolean) value);
+                checkbox.setHorizontalAlignment(SwingConstants.CENTER);
+                return checkbox;
+            }
+        });
+
+        // Configuración para la columna de Pago Parcial (6ta columna en el índice 5)
+        int partialPaymentColumnIndex = 5;
+        TableColumn partialPaymentColumn = jTable1.getColumnModel().getColumn(partialPaymentColumnIndex);
+        partialPaymentColumn.setCellEditor(new DefaultCellEditor(new JTextField()) {
+            @Override
+            public boolean stopCellEditing() {
+                try {
+                    Double.parseDouble((String) getCellEditorValue());
+                    return super.stopCellEditing();
+                } catch (NumberFormatException e) {
+                    return false;
+                }
+            }
+        });
+        partialPaymentColumn.setCellRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JTextField textField = new JTextField();
+                if (value instanceof Number) {
+                    textField.setText(String.format("%.2f", ((Number) value).doubleValue()));
+                } else if (value instanceof String) {
+                    textField.setText((String) value);
+                }
+                textField.setHorizontalAlignment(SwingConstants.RIGHT);
+                return textField;
+            }
+        });
+    }
+
+    private void updateTotalCobrar() {
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        double total = 0.0;
+        for (int i = 0; i < model.getRowCount(); i++) {
+            Object pagoTotalObj = model.getValueAt(i, 4);
+            boolean pagoTotal = pagoTotalObj instanceof Boolean && (Boolean) pagoTotalObj;
+
+            if (pagoTotal) {
+                Object importeActualizadoObj = model.getValueAt(i, 3);
+                if (importeActualizadoObj instanceof Number) {
+                    total += ((Number) importeActualizadoObj).doubleValue();
+                } else if (importeActualizadoObj instanceof String) {
+                    try {
+                        total += Double.parseDouble((String) importeActualizadoObj);
+                    } catch (NumberFormatException ex) {
+                        System.err.println("Error al parsear el importe actualizado: " + ex.getMessage());
+                    }
+                }
+            } else {
+                Object pagoParcialObj = model.getValueAt(i, 5);
+                if (pagoParcialObj instanceof Number) {
+                    total += ((Number) pagoParcialObj).doubleValue();
+                } else if (pagoParcialObj instanceof String) {
+                    try {
+                        total += Double.parseDouble((String) pagoParcialObj);
+                    } catch (NumberFormatException ex) {
+                        System.err.println("Error al parsear el pago parcial: " + ex.getMessage());
+                    }
+                }
+            }
+        }
+        totalCobrarTxt.setText(String.format("%.2f", total));
+    }
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
         buscarTxt = new javax.swing.JTextField();
         buscarBtn = new javax.swing.JButton();
@@ -83,29 +124,12 @@ public FormCobrarCuota() {
         jLabel5 = new javax.swing.JLabel();
         apellidoTxt = new javax.swing.JTextField();
         cobrarBtn = new javax.swing.JToggleButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
+        jLabel6 = new javax.swing.JLabel();
+        totalCobrarTxt = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null}
-            },
-            new String [] {
-                "id credito", "id cuota", "importe cuota", "importe actualizado", "pago total", "pago parcial"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Boolean.class, java.lang.Float.class
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-        });
-        jScrollPane1.setViewportView(jTable1);
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel1.setText("COBRAR CUOTA");
@@ -145,44 +169,75 @@ public FormCobrarCuota() {
             }
         });
 
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
+            },
+            new String [] {
+                "ID CREDITO", "ID CUOTA", "IMPORTE CUOTA", "IMPORTE ACTUALIZADO", "PAGO TOTAL", "PAGO PARCIAL"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Object.class, java.lang.Object.class, java.lang.Double.class, java.lang.Double.class, java.lang.Boolean.class, java.lang.Double.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
+        jScrollPane2.setViewportView(jTable1);
+
+        jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        jLabel6.setText("TOTAL A COBRAR:");
+
+        totalCobrarTxt.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(42, 42, 42)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(9, 9, 9)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel2)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(buscarTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(18, 18, 18)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(buscarBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addGroup(layout.createSequentialGroup()
-                                                .addComponent(jLabel4)
-                                                .addGap(18, 18, 18)
-                                                .addComponent(nombresTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(18, 18, 18)
-                                                .addComponent(jLabel5)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(apellidoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE))))))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(dniTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(569, 569, 569))
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 770, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(333, 333, 333)
-                        .addComponent(jLabel1))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(344, 344, 344)
-                        .addComponent(cobrarBtn)))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 794, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                            .addGap(42, 42, 42)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addGap(9, 9, 9)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel2)
+                                        .addGroup(layout.createSequentialGroup()
+                                            .addComponent(buscarTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addGap(18, 18, 18)
+                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addComponent(buscarBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGroup(layout.createSequentialGroup()
+                                                    .addComponent(jLabel4)
+                                                    .addGap(18, 18, 18)
+                                                    .addComponent(nombresTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                    .addGap(18, 18, 18)
+                                                    .addComponent(jLabel5)
+                                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                    .addComponent(apellidoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(jLabel3)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(dniTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(569, 569, 569))))
+                        .addGroup(layout.createSequentialGroup()
+                            .addGap(333, 333, 333)
+                            .addComponent(jLabel1))
+                        .addGroup(layout.createSequentialGroup()
+                            .addGap(113, 113, 113)
+                            .addComponent(jLabel6)
+                            .addGap(18, 18, 18)
+                            .addComponent(totalCobrarTxt)
+                            .addGap(280, 280, 280)
+                            .addComponent(cobrarBtn))))
                 .addGap(32, 32, 32))
         );
         layout.setVerticalGroup(
@@ -196,7 +251,7 @@ public FormCobrarCuota() {
                     .addComponent(buscarBtn))
                 .addGap(26, 26, 26)
                 .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(dniTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -204,11 +259,14 @@ public FormCobrarCuota() {
                     .addComponent(nombresTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5)
                     .addComponent(apellidoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 265, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(39, 39, 39)
-                .addComponent(cobrarBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(27, 27, 27))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 296, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(14, 14, 14)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cobrarBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel6)
+                    .addComponent(totalCobrarTxt))
+                .addGap(69, 69, 69))
         );
 
         pack();
@@ -226,27 +284,27 @@ public FormCobrarCuota() {
     }//GEN-LAST:event_buscarBtnActionPerformed
 
     private void cobrarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cobrarBtnActionPerformed
-      DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-    int rowCount = model.getRowCount();
 
-    CobrarCuota objetoCobrarCuota = new CobrarCuota(); // Crear la instancia aquí
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        CobrarCuota objetoCobrarCuota = new CobrarCuota();
 
-    for (int i = 0; i < rowCount; i++) {
-       Boolean isSelected = (Boolean) model.getValueAt(i, 3); // Columna CheckBox
+        for (int i = 0; i < model.getRowCount(); i++) {
+            Object pagoTotalObj = model.getValueAt(i, 4); // Columna del CheckBox
+            Boolean pagoTotal = (pagoTotalObj != null && pagoTotalObj instanceof Boolean) ? (Boolean) pagoTotalObj : false;
 
-        if (isSelected != null && isSelected) {
-            Integer idCuota = (Integer) model.getValueAt(i, 1); // Columna id_cuota
-            Double importeCuota = (Double) model.getValueAt(i, 2); // Columna importe_cuota
-            Double importeParcial = (Double) model.getValueAt(i, 5); // Columna pago parcial
-
-            if (importeParcial == null || importeParcial <= 0) {
-                importeParcial = importeCuota; // Si no hay un pago parcial, se cobra el total
+            Double montoPago = 0.0;
+            if (pagoTotal) {
+                montoPago = (model.getValueAt(i, 3) instanceof Double) ? (Double) model.getValueAt(i, 3) : 0.0; // Monto total
+            } else {
+                montoPago = (model.getValueAt(i, 5) instanceof Double) ? (Double) model.getValueAt(i, 5) : 0.0; // Monto parcial
             }
 
-            // Aquí llamas al método para procesar el pago
-            objetoCobrarCuota.procesarPago(idCuota, importeParcial);
+            Integer idCuota = (model.getValueAt(i, 1) instanceof Integer) ? (Integer) model.getValueAt(i, 1) : null;
+
+            if (montoPago > 0 && idCuota != null) {
+                objetoCobrarCuota.procesarPago(idCuota, montoPago);
+            }
         }
-    }
     }//GEN-LAST:event_cobrarBtnActionPerformed
 
     public static void main(String args[]) {
@@ -268,8 +326,10 @@ public FormCobrarCuota() {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable jTable1;
     private javax.swing.JTextField nombresTxt;
+    private javax.swing.JLabel totalCobrarTxt;
     // End of variables declaration//GEN-END:variables
 }

@@ -18,7 +18,7 @@ public class CobrarCuota {
 
         try {
             conexion = objetoConexion.establecerConexion();
-            String sql = "SELECT c.num_credito, cu.id_cuota, cu.importe_cuota, cu.recargo, cu.vencimiento "
+            String sql = "SELECT c.num_credito, cu.id_cuota, cu.importe_cuota, cu.importe_actualizado, cu.vencimiento "
                     + "FROM cuotas cu "
                     + "INNER JOIN credito c ON cu.id_credito = c.num_credito "
                     + "INNER JOIN clientes cl ON c.id_cliente = cl.id "
@@ -42,7 +42,7 @@ public class CobrarCuota {
                     rs.getInt("num_credito"),
                     rs.getInt("id_cuota"),
                     rs.getDouble("importe_cuota"),
-                    rs.getDouble("recargo"),
+                    rs.getDouble("importe_actualizado"),
                     fechaVencimiento
                 });
             }
@@ -77,7 +77,7 @@ public void procesarPago(Integer idCuota, Double montoPago) {
         conexion = objetoConexion.establecerConexion();
         conexion.setAutoCommit(false); // Comenzar la transacción
 
-        String sqlActualizarRecargo = "UPDATE cuotas SET recargo = recargo - ? WHERE id_cuota = ?";
+        String sqlActualizarRecargo = "UPDATE cuotas SET importe_actualizado = importe_actualizado - ? WHERE id_cuota = ?";
         pstmtActualizarRecargo = conexion.prepareStatement(sqlActualizarRecargo);
 
         String sqlInsertarPago = "INSERT INTO pagos (id_cuota, monto) VALUES (?, ?)";

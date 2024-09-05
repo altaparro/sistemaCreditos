@@ -22,7 +22,7 @@ public void InsertarCredito(JTextField dni_cliente, JTextPane observacion, JText
     String consultaIDCliente = "SELECT id FROM clientes WHERE dni = ?";
     String consultaCreditos = "INSERT INTO credito(id_cliente, observacion, monto, fecha, id_plan_pago) VALUES (?,?,?,?,?)";
     String consultaPlanPago = "SELECT cant_cuotas, interes FROM plan_pago WHERE id_plan_pago = ?";
-    String consultaCuotas = "INSERT INTO cuotas(id_cliente, id_credito, id_plan_pago, importe_cuota, recargo, vencimiento) VALUES (?,?,?,?,?,?)";
+    String consultaCuotas = "INSERT INTO cuotas(id_cliente, id_credito, id_plan_pago, importe_cuota, importe_actualizado, vencimiento, pago_realizado) VALUES (?,?,?,?,?,?,?)";
 
     Connection conexion = null;
     PreparedStatement psBuscarCliente = null;
@@ -82,6 +82,7 @@ public void InsertarCredito(JTextField dni_cliente, JTextPane observacion, JText
                         psInsertarCuota.setDouble(4, importeCuotaConInteres);
                         psInsertarCuota.setDouble(5, importeCuotaConInteres); // El recargo es el mismo importe de la cuota con interés
                         psInsertarCuota.setString(6, vencimiento.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+                        psInsertarCuota.setInt(7, 0);
                         psInsertarCuota.executeUpdate();
                     }
 
