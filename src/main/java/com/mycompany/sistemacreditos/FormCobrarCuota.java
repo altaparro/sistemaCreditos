@@ -286,27 +286,34 @@ public class FormCobrarCuota extends javax.swing.JFrame {
     }//GEN-LAST:event_buscarBtnActionPerformed
 
     private void cobrarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cobrarBtnActionPerformed
- DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         CobrarCuota objetoCobrarCuota = new CobrarCuota();
         boolean algunPagoProcesado = false;
+        StringBuilder mensajeError = new StringBuilder();
+        boolean huboErrores = false;
 
         for (int i = 0; i < model.getRowCount(); i++) {
             Object pagoTotalObj = model.getValueAt(i, 4);
             boolean pagoTotal = pagoTotalObj instanceof Boolean && (Boolean) pagoTotalObj;
 
             Double montoPago = 0.0;
-            if (pagoTotal) {
-                Object importeActualizadoObj = model.getValueAt(i, 3);
-                if (importeActualizadoObj instanceof Number) {
-                    montoPago = ((Number) importeActualizadoObj).doubleValue();
-                } else if (importeActualizadoObj instanceof String) {
-                    try {
-                        montoPago = Double.parseDouble((String) importeActualizadoObj);
-                    } catch (NumberFormatException ex) {
-                        System.err.println("Error al parsear el importe actualizado: " + ex.getMessage());
-                        continue;
-                    }
+            Double importeActualizado = 0.0;
+
+            Object importeActualizadoObj = model.getValueAt(i, 3);
+            if (importeActualizadoObj instanceof Number) {
+                importeActualizado = ((Number) importeActualizadoObj).doubleValue();
+            } else if (importeActualizadoObj instanceof String) {
+                try {
+                    importeActualizado = Double.parseDouble((String) importeActualizadoObj);
+                } catch (NumberFormatException ex) {
+                    mensajeError.append("Error en fila ").append(i + 1).append(": Importe actualizado inválido\n");
+                    huboErrores = true;
+                    continue;
                 }
+            }
+
+            if (pagoTotal) {
+                montoPago = importeActualizado;
             } else {
                 Object pagoParcialObj = model.getValueAt(i, 5);
                 if (pagoParcialObj instanceof Number) {
@@ -315,7 +322,8 @@ public class FormCobrarCuota extends javax.swing.JFrame {
                     try {
                         montoPago = Double.parseDouble((String) pagoParcialObj);
                     } catch (NumberFormatException ex) {
-                        System.err.println("Error al parsear el pago parcial: " + ex.getMessage());
+                        mensajeError.append("Error en fila ").append(i + 1).append(": Pago parcial inválido\n");
+                        huboErrores = true;
                         continue;
                     }
                 }
@@ -329,23 +337,37 @@ public class FormCobrarCuota extends javax.swing.JFrame {
                 try {
                     idCuota = Integer.parseInt((String) idCuotaObj);
                 } catch (NumberFormatException ex) {
-                    System.err.println("Error al parsear el ID de la cuota: " + ex.getMessage());
+                    mensajeError.append("Error en fila ").append(i + 1).append(": ID de cuota inválido\n");
+                    huboErrores = true;
                     continue;
                 }
             }
 
             if (montoPago > 0 && idCuota != null) {
-                objetoCobrarCuota.procesarPago(idCuota, montoPago);
-                algunPagoProcesado = true;
+                if (montoPago > importeActualizado) {
+                    mensajeError.append("Error en fila ").append(i + 1).append(": El monto del pago (").append(montoPago)
+                            .append(") es mayor que el importe actualizado (").append(importeActualizado).append(")\n");
+                    huboErrores = true;
+                } else {
+                    try {
+                        objetoCobrarCuota.procesarPago(idCuota, montoPago);
+                        algunPagoProcesado = true;
+                    } catch (Exception ex) {
+                        mensajeError.append("Error al procesar el pago de la cuota ").append(idCuota).append(": ").append(ex.getMessage()).append("\n");
+                        huboErrores = true;
+                    }
+                }
             }
         }
 
-        if (algunPagoProcesado) {
+        if (huboErrores) {
+            JOptionPane.showMessageDialog(this, "Se encontraron los siguientes errores:\n" + mensajeError.toString(), "Errores en el procesamiento", JOptionPane.ERROR_MESSAGE);
+        } else if (algunPagoProcesado) {
             buscarBtnActionPerformed(null);
             updateTotalCobrar();
-            JOptionPane.showMessageDialog(this, "Pagos procesados con éxito.");
+            JOptionPane.showMessageDialog(this, "Todos los pagos se procesaron con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
         } else {
-            JOptionPane.showMessageDialog(this, "No se seleccionó ningún pago para procesar.");
+            JOptionPane.showMessageDialog(this, "No se seleccionó ningún pago para procesar.", "Aviso", JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_cobrarBtnActionPerformed
 
