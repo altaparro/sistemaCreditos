@@ -21,8 +21,8 @@ public void InsertarCredito(JTextField dni_cliente, JTextPane observacion, JText
     Conexion objetoConexion = new Conexion();
     String consultaIDCliente = "SELECT id FROM clientes WHERE dni = ?";
     String consultaCreditos = "INSERT INTO credito(id_cliente, observacion, monto, fecha, id_plan_pago) VALUES (?,?,?,?,?)";
-    String consultaPlanPago = "SELECT cant_cuotas, interes FROM plan_pago WHERE id_plan_pago = ?";
-    String consultaCuotas = "INSERT INTO cuotas(id_cliente, id_credito, id_plan_pago, importe_cuota, importe_actualizado, vencimiento, pago_realizado) VALUES (?,?,?,?,?,?,?)";
+    String consultaPlanPago = "SELECT cant_cuotas, interes, tipo FROM plan_pago WHERE id_plan_pago = ?";
+    String consultaCuotas = "INSERT INTO cuotas(id_cliente, id_credito, id_plan_pago, num_cuota, importe_cuota, importe_actualizado, vencimiento, pago_realizado) VALUES (?,?,?,?,?,?,?,?)";
 
     Connection conexion = null;
     PreparedStatement psBuscarCliente = null;
@@ -43,7 +43,7 @@ public void InsertarCredito(JTextField dni_cliente, JTextPane observacion, JText
         if (rs.next()) {
             int id_cliente = rs.getInt("id");
 
-            // Obtener la cantidad de cuotas y el interés del plan de pago seleccionado
+            // Obtener la cantidad de cuotas, el interés y el tipo de plan de pago seleccionado
             psPlanPago = conexion.prepareStatement(consultaPlanPago);
             psPlanPago.setInt(1, id_plan_pago);
             ResultSet rsPlan = psPlanPago.executeQuery();
@@ -51,6 +51,7 @@ public void InsertarCredito(JTextField dni_cliente, JTextPane observacion, JText
             if (rsPlan.next()) {
                 int cant_cuotas = rsPlan.getInt("cant_cuotas");
                 double interes = rsPlan.getDouble("interes");
+                String tipo = rsPlan.getString("tipo");
 
                 // Insertar el crédito
                 psInsertarCredito = conexion.prepareStatement(consultaCreditos, PreparedStatement.RETURN_GENERATED_KEYS);
@@ -69,20 +70,35 @@ public void InsertarCredito(JTextField dni_cliente, JTextPane observacion, JText
                     // Calcular el importe de cada cuota y aplicar el interés
                     double importeCuotaBase = Double.parseDouble(monto.getText()) / cant_cuotas;
 
-                  
-
                     for (int i = 0; i < cant_cuotas; i++) {
-                        LocalDate vencimiento = LocalDate.parse(fecha, DateTimeFormatter.ofPattern("dd-MM-yyyy")).plusMonths(i);
+                        LocalDate vencimiento;
+
+                        if (tipo.equalsIgnoreCase("primera en el momento") && i == 0) {
+                            // La primera cuota se paga en el momento
+                            vencimiento = LocalDate.parse(fecha, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+                        } else {
+                            // Las siguientes cuotas tienen vencimientos mensuales
+                            vencimiento = LocalDate.parse(fecha, DateTimeFormatter.ofPattern("dd-MM-yyyy")).plusMonths(i);
+                        }
+
                         double importeCuotaConInteres = importeCuotaBase * (1 + interes / 100);
 
                         psInsertarCuota = conexion.prepareStatement(consultaCuotas);
                         psInsertarCuota.setInt(1, id_cliente);
                         psInsertarCuota.setInt(2, id_credito);
                         psInsertarCuota.setInt(3, id_plan_pago);
-                        psInsertarCuota.setDouble(4, importeCuotaConInteres);
-                        psInsertarCuota.setDouble(5, importeCuotaConInteres); // El recargo es el mismo importe de la cuota con interés
-                        psInsertarCuota.setString(6, vencimiento.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
-                        psInsertarCuota.setInt(7, 0);
+                        psInsertarCuota.setInt(4, i + 1); // Número de cuota
+                        psInsertarCuota.setDouble(5, importeCuotaConInteres);
+                        psInsertarCuota.setDouble(6, importeCuotaConInteres); // El recargo es el mismo importe de la cuota con interés
+                        psInsertarCuota.setString(7, vencimiento.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+
+                        // Si es la primera cuota y el tipo es "primera en el momento", se marca como pagada
+                        if (tipo.equalsIgnoreCase("primera en el momento") && i == 0) {
+                            psInsertarCuota.setInt(8, 1); // La primera cuota ya está pagada
+                        } else {
+                            psInsertarCuota.setInt(8, 0); // Las demás cuotas no están pagadas
+                        }
+
                         psInsertarCuota.executeUpdate();
                     }
 
@@ -121,6 +137,9 @@ public void InsertarCredito(JTextField dni_cliente, JTextPane observacion, JText
         }
     }
 }
+
+
+
 
 
 
