@@ -155,6 +155,9 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="dniTxt">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+      </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel4">
       <Properties>
@@ -162,6 +165,9 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="nombresTxt">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+      </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel5">
       <Properties>
@@ -169,6 +175,9 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="apellidoTxt">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+      </Properties>
     </Component>
     <Container class="javax.swing.JScrollPane" name="jScrollPane1">
       <AuxValues>

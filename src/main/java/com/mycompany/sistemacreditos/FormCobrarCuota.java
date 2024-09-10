@@ -33,81 +33,107 @@ public class FormCobrarCuota extends javax.swing.JFrame {
     }
 
     private void configurarTabla() {
-        // Configuración para la columna de CheckBox (5ta columna en el índice 4)
-        int checkboxColumnIndex = 4;
-        TableColumn checkboxColumn = jTable1.getColumnModel().getColumn(checkboxColumnIndex);
-        checkboxColumn.setCellEditor(new DefaultCellEditor(new JCheckBox()));
-        checkboxColumn.setCellRenderer(new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                JCheckBox checkbox = new JCheckBox();
-                checkbox.setSelected(value != null && value instanceof Boolean && (Boolean) value);
-                checkbox.setHorizontalAlignment(SwingConstants.CENTER);
-                return checkbox;
+  int importeActualizadoColumnIndex = 4;
+    TableColumn importeActualizadoColumn = jTable1.getColumnModel().getColumn(importeActualizadoColumnIndex);
+    importeActualizadoColumn.setCellRenderer(new DefaultTableCellRenderer() {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            JTextField textField = new JTextField();
+            if (value instanceof Number) {
+                textField.setText(String.format("%.2f", ((Number) value).doubleValue()));
+            } else if (value instanceof String) {
+                textField.setText((String) value);
             }
-        });
+            textField.setHorizontalAlignment(SwingConstants.RIGHT);
+            return textField;
+        }
+    });
 
-        // Configuración para la columna de Pago Parcial (6ta columna en el índice 5)
-        int partialPaymentColumnIndex = 5;
-        TableColumn partialPaymentColumn = jTable1.getColumnModel().getColumn(partialPaymentColumnIndex);
-        partialPaymentColumn.setCellEditor(new DefaultCellEditor(new JTextField()) {
-            @Override
-            public boolean stopCellEditing() {
-                try {
-                    Double.parseDouble((String) getCellEditorValue());
-                    return super.stopCellEditing();
-                } catch (NumberFormatException e) {
-                    return false;
-                }
+    // Configuración para la columna de Pago Total (6ta columna en el índice 5)
+    int pagoTotalColumnIndex = 5;
+    TableColumn pagoTotalColumn = jTable1.getColumnModel().getColumn(pagoTotalColumnIndex);
+    pagoTotalColumn.setCellEditor(new DefaultCellEditor(new JCheckBox()));
+    pagoTotalColumn.setCellRenderer(new DefaultTableCellRenderer() {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            JCheckBox checkbox = new JCheckBox();
+            checkbox.setSelected(value != null && value instanceof Boolean && (Boolean) value);
+            checkbox.setHorizontalAlignment(SwingConstants.CENTER);
+            return checkbox;
+        }
+    });
+
+    // Configuración para la columna de Pago Parcial (7ma columna en el índice 6)
+    int pagoParcialColumnIndex = 6;
+    TableColumn pagoParcialColumn = jTable1.getColumnModel().getColumn(pagoParcialColumnIndex);
+    JTextField pagoParcialTextField = new JTextField();
+    pagoParcialTextField.addActionListener(e -> updateTotalCobrar());
+    pagoParcialColumn.setCellEditor(new DefaultCellEditor(pagoParcialTextField) {
+        @Override
+        public boolean stopCellEditing() {
+            try {
+                Double.parseDouble((String) getCellEditorValue());
+                updateTotalCobrar();
+                return super.stopCellEditing();
+            } catch (NumberFormatException e) {
+                return false;
             }
-        });
-        partialPaymentColumn.setCellRenderer(new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                JTextField textField = new JTextField();
-                if (value instanceof Number) {
-                    textField.setText(String.format("%.2f", ((Number) value).doubleValue()));
-                } else if (value instanceof String) {
-                    textField.setText((String) value);
-                }
-                textField.setHorizontalAlignment(SwingConstants.RIGHT);
-                return textField;
+        }
+    });
+    pagoParcialColumn.setCellRenderer(new DefaultTableCellRenderer() {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            JTextField textField = new JTextField();
+            if (value instanceof Number) {
+                textField.setText(String.format("%.2f", ((Number) value).doubleValue()));
+            } else if (value instanceof String) {
+                textField.setText((String) value);
             }
-        });
+            textField.setHorizontalAlignment(SwingConstants.RIGHT);
+            return textField;
+        }
+    });
+
+    // Agregar TableModelListener para actualizar el total cuando cambie cualquier celda
+    jTable1.getModel().addTableModelListener(e -> {
+        if (e.getType() == TableModelEvent.UPDATE) {
+            updateTotalCobrar();
+        }
+    });
     }
 
     private void updateTotalCobrar() {
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-        double total = 0.0;
-        for (int i = 0; i < model.getRowCount(); i++) {
-            Object pagoTotalObj = model.getValueAt(i, 4);
-            boolean pagoTotal = pagoTotalObj instanceof Boolean && (Boolean) pagoTotalObj;
+  DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+    double total = 0.0;
+    for (int i = 0; i < model.getRowCount(); i++) {
+        Object pagoTotalObj = model.getValueAt(i, 5);
+        boolean pagoTotal = pagoTotalObj instanceof Boolean && (Boolean) pagoTotalObj;
 
-            if (pagoTotal) {
-                Object importeActualizadoObj = model.getValueAt(i, 3);
-                if (importeActualizadoObj instanceof Number) {
-                    total += ((Number) importeActualizadoObj).doubleValue();
-                } else if (importeActualizadoObj instanceof String) {
-                    try {
-                        total += Double.parseDouble((String) importeActualizadoObj);
-                    } catch (NumberFormatException ex) {
-                        System.err.println("Error al parsear el importe actualizado: " + ex.getMessage());
-                    }
+        if (pagoTotal) {
+            Object importeActualizadoObj = model.getValueAt(i, 4);
+            if (importeActualizadoObj instanceof Number) {
+                total += ((Number) importeActualizadoObj).doubleValue();
+            } else if (importeActualizadoObj instanceof String) {
+                try {
+                    total += Double.parseDouble((String) importeActualizadoObj);
+                } catch (NumberFormatException ex) {
+                    System.err.println("Error al parsear el importe actualizado: " + ex.getMessage());
                 }
-            } else {
-                Object pagoParcialObj = model.getValueAt(i, 5);
-                if (pagoParcialObj instanceof Number) {
-                    total += ((Number) pagoParcialObj).doubleValue();
-                } else if (pagoParcialObj instanceof String) {
-                    try {
-                        total += Double.parseDouble((String) pagoParcialObj);
-                    } catch (NumberFormatException ex) {
-                        System.err.println("Error al parsear el pago parcial: " + ex.getMessage());
-                    }
+            }
+        } else {
+            Object pagoParcialObj = model.getValueAt(i, 6);
+            if (pagoParcialObj instanceof Number) {
+                total += ((Number) pagoParcialObj).doubleValue();
+            } else if (pagoParcialObj instanceof String && !((String) pagoParcialObj).isEmpty()) {
+                try {
+                    total += Double.parseDouble((String) pagoParcialObj);
+                } catch (NumberFormatException ex) {
+                    System.err.println("Error al parsear el pago parcial: " + ex.getMessage());
                 }
             }
         }
-        totalCobrarTxt.setText(String.format("%.2f", total));
+    }
+    totalCobrarTxt.setText(String.format("%.2f", total));
     }
 
     @SuppressWarnings("unchecked")
@@ -172,17 +198,17 @@ public class FormCobrarCuota extends javax.swing.JFrame {
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null}
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null}
             },
             new String [] {
-                "ID CREDITO", "ID CUOTA", "IMPORTE CUOTA", "IMPORTE ACTUALIZADO", "PAGO TOTAL", "PAGO PARCIAL"
+                "ID CREDITO", "ID CUOTA", "NUM CUOTA", "IMPORTE CUOTA", "IMPORTE ACTUALIZADO", "PAGO TOTAL", "PAGO PARCIAL"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.Object.class, java.lang.Double.class, java.lang.Double.class, java.lang.Boolean.class, java.lang.Double.class
+                java.lang.Object.class, java.lang.Object.class, java.lang.Integer.class, java.lang.Double.class, java.lang.Double.class, java.lang.Boolean.class, java.lang.Double.class
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -286,89 +312,89 @@ public class FormCobrarCuota extends javax.swing.JFrame {
     }//GEN-LAST:event_buscarBtnActionPerformed
 
     private void cobrarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cobrarBtnActionPerformed
-        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-        CobrarCuota objetoCobrarCuota = new CobrarCuota();
-        boolean algunPagoProcesado = false;
-        StringBuilder mensajeError = new StringBuilder();
-        boolean huboErrores = false;
+     DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+    CobrarCuota objetoCobrarCuota = new CobrarCuota();
+    boolean algunPagoProcesado = false;
+    StringBuilder mensajeError = new StringBuilder();
+    boolean huboErrores = false;
 
-        for (int i = 0; i < model.getRowCount(); i++) {
-            Object pagoTotalObj = model.getValueAt(i, 4);
-            boolean pagoTotal = pagoTotalObj instanceof Boolean && (Boolean) pagoTotalObj;
+    for (int i = 0; i < model.getRowCount(); i++) {
+        Object pagoTotalObj = model.getValueAt(i, 5);
+        boolean pagoTotal = pagoTotalObj instanceof Boolean && (Boolean) pagoTotalObj;
 
-            Double montoPago = 0.0;
-            Double importeActualizado = 0.0;
+        Double montoPago = 0.0;
+        Double importeActualizado = 0.0;
 
-            Object importeActualizadoObj = model.getValueAt(i, 3);
-            if (importeActualizadoObj instanceof Number) {
-                importeActualizado = ((Number) importeActualizadoObj).doubleValue();
-            } else if (importeActualizadoObj instanceof String) {
-                try {
-                    importeActualizado = Double.parseDouble((String) importeActualizadoObj);
-                } catch (NumberFormatException ex) {
-                    mensajeError.append("Error en fila ").append(i + 1).append(": Importe actualizado inválido\n");
-                    huboErrores = true;
-                    continue;
-                }
-            }
-
-            if (pagoTotal) {
-                montoPago = importeActualizado;
-            } else {
-                Object pagoParcialObj = model.getValueAt(i, 5);
-                if (pagoParcialObj instanceof Number) {
-                    montoPago = ((Number) pagoParcialObj).doubleValue();
-                } else if (pagoParcialObj instanceof String) {
-                    try {
-                        montoPago = Double.parseDouble((String) pagoParcialObj);
-                    } catch (NumberFormatException ex) {
-                        mensajeError.append("Error en fila ").append(i + 1).append(": Pago parcial inválido\n");
-                        huboErrores = true;
-                        continue;
-                    }
-                }
-            }
-
-            Object idCuotaObj = model.getValueAt(i, 1);
-            Integer idCuota = null;
-            if (idCuotaObj instanceof Number) {
-                idCuota = ((Number) idCuotaObj).intValue();
-            } else if (idCuotaObj instanceof String) {
-                try {
-                    idCuota = Integer.parseInt((String) idCuotaObj);
-                } catch (NumberFormatException ex) {
-                    mensajeError.append("Error en fila ").append(i + 1).append(": ID de cuota inválido\n");
-                    huboErrores = true;
-                    continue;
-                }
-            }
-
-            if (montoPago > 0 && idCuota != null) {
-                if (montoPago > importeActualizado) {
-                    mensajeError.append("Error en fila ").append(i + 1).append(": El monto del pago (").append(montoPago)
-                            .append(") es mayor que el importe actualizado (").append(importeActualizado).append(")\n");
-                    huboErrores = true;
-                } else {
-                    try {
-                        objetoCobrarCuota.procesarPago(idCuota, montoPago);
-                        algunPagoProcesado = true;
-                    } catch (Exception ex) {
-                        mensajeError.append("Error al procesar el pago de la cuota ").append(idCuota).append(": ").append(ex.getMessage()).append("\n");
-                        huboErrores = true;
-                    }
-                }
+        Object importeActualizadoObj = model.getValueAt(i, 4);
+        if (importeActualizadoObj instanceof Number) {
+            importeActualizado = ((Number) importeActualizadoObj).doubleValue();
+        } else if (importeActualizadoObj instanceof String) {
+            try {
+                importeActualizado = Double.parseDouble((String) importeActualizadoObj);
+            } catch (NumberFormatException ex) {
+                mensajeError.append("Error en fila ").append(i + 1).append(": Importe actualizado inválido\n");
+                huboErrores = true;
+                continue;
             }
         }
 
-        if (huboErrores) {
-            JOptionPane.showMessageDialog(this, "Se encontraron los siguientes errores:\n" + mensajeError.toString(), "Errores en el procesamiento", JOptionPane.ERROR_MESSAGE);
-        } else if (algunPagoProcesado) {
-            buscarBtnActionPerformed(null);
-            updateTotalCobrar();
-            JOptionPane.showMessageDialog(this, "Todos los pagos se procesaron con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        if (pagoTotal) {
+            montoPago = importeActualizado;
         } else {
-            JOptionPane.showMessageDialog(this, "No se seleccionó ningún pago para procesar.", "Aviso", JOptionPane.INFORMATION_MESSAGE);
+            Object pagoParcialObj = model.getValueAt(i, 6);
+            if (pagoParcialObj instanceof Number) {
+                montoPago = ((Number) pagoParcialObj).doubleValue();
+            } else if (pagoParcialObj instanceof String) {
+                try {
+                    montoPago = Double.parseDouble((String) pagoParcialObj);
+                } catch (NumberFormatException ex) {
+                    mensajeError.append("Error en fila ").append(i + 1).append(": Pago parcial inválido\n");
+                    huboErrores = true;
+                    continue;
+                }
+            }
         }
+
+        Object idCuotaObj = model.getValueAt(i, 1);
+        Integer idCuota = null;
+        if (idCuotaObj instanceof Number) {
+            idCuota = ((Number) idCuotaObj).intValue();
+        } else if (idCuotaObj instanceof String) {
+            try {
+                idCuota = Integer.parseInt((String) idCuotaObj);
+            } catch (NumberFormatException ex) {
+                mensajeError.append("Error en fila ").append(i + 1).append(": ID de cuota inválido\n");
+                huboErrores = true;
+                continue;
+            }
+        }
+
+        if (montoPago > 0 && idCuota != null) {
+            if (montoPago > importeActualizado) {
+                mensajeError.append("Error en fila ").append(i + 1).append(": El monto del pago (").append(montoPago)
+                        .append(") es mayor que el importe actualizado (").append(importeActualizado).append(")\n");
+                huboErrores = true;
+            } else {
+                try {
+                    objetoCobrarCuota.procesarPago(idCuota, montoPago);
+                    algunPagoProcesado = true;
+                } catch (Exception ex) {
+                    mensajeError.append("Error al procesar el pago de la cuota ").append(idCuota).append(": ").append(ex.getMessage()).append("\n");
+                    huboErrores = true;
+                }
+            }
+        }
+    }
+
+    if (huboErrores) {
+        JOptionPane.showMessageDialog(this, "Se encontraron los siguientes errores:\n" + mensajeError.toString(), "Errores en el procesamiento", JOptionPane.ERROR_MESSAGE);
+    } else if (algunPagoProcesado) {
+        buscarBtnActionPerformed(null);
+        updateTotalCobrar();
+        JOptionPane.showMessageDialog(this, "Todos los pagos se procesaron con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+    } else {
+        JOptionPane.showMessageDialog(this, "No se seleccionó ningún pago para procesar.", "Aviso", JOptionPane.INFORMATION_MESSAGE);
+    }
     }//GEN-LAST:event_cobrarBtnActionPerformed
 
     public static void main(String args[]) {

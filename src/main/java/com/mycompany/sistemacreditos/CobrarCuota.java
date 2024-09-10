@@ -18,7 +18,7 @@ public class CobrarCuota {
 
         try {
             conexion = objetoConexion.establecerConexion();
-            String sql = "SELECT c.num_credito, cu.id_cuota, cu.importe_cuota, cu.importe_actualizado, cu.vencimiento "
+            String sql = "SELECT c.num_credito, cu.id_cuota, cu.num_cuota, cu.importe_cuota, cu.importe_actualizado, cu.vencimiento "
                     + "FROM cuotas cu "
                     + "INNER JOIN credito c ON cu.id_credito = c.num_credito "
                     + "INNER JOIN clientes cl ON c.id_cliente = cl.id "
@@ -41,9 +41,11 @@ public class CobrarCuota {
                 model.addRow(new Object[]{
                     rs.getInt("num_credito"),
                     rs.getInt("id_cuota"),
+                    rs.getInt("num_cuota"),
                     rs.getDouble("importe_cuota"),
                     rs.getDouble("importe_actualizado"),
-                    fechaVencimiento
+                    false,  // Columna de pago total (inicialmente false)
+                    0.0     // Columna de pago parcial (inicialmente 0.0)
                 });
             }
         } catch (SQLException e) {
@@ -171,5 +173,4 @@ public class CobrarCuota {
             javax.swing.JOptionPane.showMessageDialog(null, "Pago procesado correctamente.");
         }
     }
-
 }

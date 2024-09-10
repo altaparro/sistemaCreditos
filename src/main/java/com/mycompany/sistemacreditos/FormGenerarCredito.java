@@ -57,9 +57,15 @@ public class FormGenerarCredito extends javax.swing.JFrame {
 
         jLabel3.setText("DNI:");
 
+        dniTxt.setEditable(false);
+
         jLabel4.setText("NOMBRES:");
 
+        nombresTxt.setEditable(false);
+
         jLabel5.setText("APELLIDO:");
+
+        apellidoTxt.setEditable(false);
 
         jScrollPane1.setViewportView(observacionesText);
 
