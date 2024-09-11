@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 public class FormGenerarCredito extends javax.swing.JFrame {
 
@@ -169,21 +170,27 @@ public class FormGenerarCredito extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        Creditos objetoCreditos = new Creditos();
-        LocalDate fechaActual = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        String fecha = fechaActual.format(formatter);
+     Creditos objetoCreditos = new Creditos();
+    LocalDate fechaActual = LocalDate.now();
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    String fecha = fechaActual.format(formatter);
 
-        // Obtener el ítem seleccionado del combo box
-        String seleccion = (String) planPagoComboBox.getSelectedItem();
+    // Obtener el ítem seleccionado del combo box
+    String seleccion = (String) planPagoComboBox.getSelectedItem();
 
-        // Extraer el id_plan_pago
-        int idPlanPago = Integer.parseInt(seleccion.split(" - ")[0]);
+    // Extraer el id_plan_pago
+    int idPlanPago = Integer.parseInt(seleccion.split(" - ")[0]);
 
-        System.out.println("ID del plan de pago encontrado: " + idPlanPago);
+    // Insertar el crédito y obtener el ID del crédito insertado
+    int idCreditoInsertado = objetoCreditos.insertarCredito(dniTxt, observacionesText, montoTxt, fecha, idPlanPago);
 
-        // Ahora puedes usar el ID del plan de pago para guardarlo en la base de datos junto con el crédito
-        objetoCreditos.InsertarCredito(dniTxt, observacionesText, montoTxt, fecha, idPlanPago);
+    if (idCreditoInsertado != -1) {
+        // Si la inserción fue exitosa, generar el PDF
+        objetoCreditos.generarPDFCredito(idCreditoInsertado);
+        JOptionPane.showMessageDialog(this, "Crédito insertado y PDF generado con éxito.");
+    } else {
+        JOptionPane.showMessageDialog(this, "Error al insertar el crédito. No se pudo generar el PDF.");
+    }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
