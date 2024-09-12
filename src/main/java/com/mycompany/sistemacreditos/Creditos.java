@@ -33,125 +33,140 @@ public class Creditos {
     private Map<String, Integer> planPagoMap = new HashMap<>();
 
     public void generarPDFCredito(int idCredito) {
-        Conexion objetoConexion = new Conexion();
-        Connection conexion = null;
-        Document documento = new Document();
-        try {
-            conexion = objetoConexion.establecerConexion();
-            String rutaArchivo = "Credito_" + idCredito + ".pdf";
-            PdfWriter.getInstance(documento, new FileOutputStream(rutaArchivo));
-            documento.open();
+    Conexion objetoConexion = new Conexion();
+    Connection conexion = null;
+    Document documento = new Document();
+    String rutaArchivo = "Credito_" + idCredito + ".pdf";
 
-            // Agregar logo
-            Image logo = Image.getInstance("logo.png");
-            logo.scaleToFit(100, 100);
-            logo.setAlignment(Element.ALIGN_CENTER);
-            documento.add(logo);
+    try {
+        conexion = objetoConexion.establecerConexion();
+        PdfWriter.getInstance(documento, new FileOutputStream(rutaArchivo));
+        documento.open();
 
-            // Datos del negocio
-            Font fuenteTitulo = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18, BaseColor.BLACK);
-            Paragraph titulo = new Paragraph("Deportes 7", fuenteTitulo);
-            titulo.setAlignment(Element.ALIGN_CENTER);
-            documento.add(titulo);
+        // Agregar logo
+        Image logo = Image.getInstance("logo.png");
+        logo.scaleToFit(150, 150);
+        logo.setAlignment(Element.ALIGN_CENTER);
+        documento.add(logo);
 
-            Font fuenteNormal = FontFactory.getFont(FontFactory.HELVETICA, 12, BaseColor.BLACK);
-            documento.add(new Paragraph("Dirección: Avenida 7 Número 2278", fuenteNormal));
-            documento.add(new Paragraph("Teléfono: (0221) 457-7707", fuenteNormal));
-            documento.add(new Paragraph("\n"));
+        // Datos del negocio
+        Font fuenteTitulo = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18, BaseColor.BLACK);
+        Paragraph titulo = new Paragraph("Deportes 7", fuenteTitulo);
+        titulo.setAlignment(Element.ALIGN_CENTER);
+        documento.add(titulo);
 
-            // Datos del cliente y crédito
-            String sqlCliente = "SELECT c.dni, c.nombres, c.apellidos, cr.monto, cr.fecha, cr.observacion "
-                    + "FROM clientes c "
-                    + "JOIN credito cr ON c.id = cr.id_cliente "
-                    + "WHERE cr.num_credito = ?";
+        Font fuenteNormal = FontFactory.getFont(FontFactory.HELVETICA, 12, BaseColor.BLACK);
+        documento.add(new Paragraph("Dirección: Avenida 7 Número 2278", fuenteNormal));
+        documento.add(new Paragraph("Teléfono: (0221) 457-7707", fuenteNormal));
+        documento.add(new Paragraph("\n"));
 
-            try (PreparedStatement pstmt = conexion.prepareStatement(sqlCliente)) {
-                pstmt.setInt(1, idCredito);
-                try (ResultSet rs = pstmt.executeQuery()) {
-                    if (rs.next()) {
-                        documento.add(new Paragraph("Datos del Cliente:", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
-                        documento.add(new Paragraph("Nombre: " + rs.getString("nombres") + " " + rs.getString("apellidos"), fuenteNormal));
-                        documento.add(new Paragraph("DNI: " + rs.getString("dni"), fuenteNormal));
-                        documento.add(new Paragraph("\n"));
+        // Datos del cliente y crédito
+        String sqlCliente = "SELECT c.dni, c.nombres, c.apellidos, cr.monto, cr.fecha, cr.observacion "
+                + "FROM clientes c "
+                + "JOIN credito cr ON c.id = cr.id_cliente "
+                + "WHERE cr.num_credito = ?";
 
-                        documento.add(new Paragraph("Datos del Crédito:", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
-                        documento.add(new Paragraph("Monto: $" + rs.getDouble("monto"), fuenteNormal));
-                        documento.add(new Paragraph("Fecha: " + rs.getString("fecha"), fuenteNormal));
-                        documento.add(new Paragraph("Observación: " + rs.getString("observacion"), fuenteNormal));
-                        documento.add(new Paragraph("\n"));
-                    }
-                }
-            }
-
-            // Tabla de cuotas
-            PdfPTable tabla = new PdfPTable(5);
-            tabla.setWidthPercentage(100);
-            tabla.addCell("N° Cuota");
-            tabla.addCell("Importe");
-            tabla.addCell("Vencimiento");
-            tabla.addCell("Recargo");
-            tabla.addCell("Estado");
-
-            String sqlCuotas = "SELECT num_cuota, importe_cuota, vencimiento, importe_actualizado, pago_realizado "
-                    + "FROM cuotas WHERE id_credito = ?";
-
-            try (PreparedStatement pstmt = conexion.prepareStatement(sqlCuotas)) {
-                pstmt.setInt(1, idCredito);
-                try (ResultSet rs = pstmt.executeQuery()) {
-                    while (rs.next()) {
-                        tabla.addCell(String.valueOf(rs.getInt("num_cuota")));
-                        tabla.addCell("$" + rs.getDouble("importe_cuota"));
-                        tabla.addCell(rs.getString("vencimiento"));
-                        tabla.addCell("$" + rs.getDouble("importe_actualizado"));
-                        tabla.addCell(rs.getBoolean("pago_realizado") ? "Pagada" : "Pendiente");
-                    }
-                }
-            }
-            documento.add(tabla);
-
-            // Espacio para firma
-            documento.add(new Paragraph("\n\n\n"));
-            documento.add(new Paragraph("______________________", fuenteNormal));
-            documento.add(new Paragraph("Firma", fuenteNormal));
-            documento.add(new Paragraph("\n"));
-            documento.add(new Paragraph("______________________", fuenteNormal));
-            documento.add(new Paragraph("Aclaración", fuenteNormal));
-            documento.add(new Paragraph("\n"));
-            documento.add(new Paragraph("______________________", fuenteNormal));
-            documento.add(new Paragraph("DNI", fuenteNormal));
-
-            JOptionPane.showMessageDialog(null, "PDF generado con éxito: " + rutaArchivo);
-        } catch (DocumentException | IOException | SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al generar el PDF: " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            documento.close();
-            if (conexion != null) {
-                try {
-                    conexion.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
+        try (PreparedStatement pstmt = conexion.prepareStatement(sqlCliente)) {
+            pstmt.setInt(1, idCredito);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    documento.add(new Paragraph("Datos del Cliente:", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
+                    documento.add(new Paragraph("Nombre: " + rs.getString("nombres") + " " + rs.getString("apellidos"), fuenteNormal));
+                    documento.add(new Paragraph("DNI: " + rs.getString("dni"), fuenteNormal));
+                    documento.add(new Paragraph("\n"));
+                        
+                    documento.add(new Paragraph("Datos del Crédito:", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
+                    documento.add(new Paragraph("Numero de credito: " + idCredito, fuenteNormal));
+                    documento.add(new Paragraph("Monto: $" + rs.getDouble("monto"), fuenteNormal));
+                    documento.add(new Paragraph("Fecha: " + rs.getString("fecha"), fuenteNormal));
+                    documento.add(new Paragraph("Observación: " + rs.getString("observacion"), fuenteNormal));
+                    documento.add(new Paragraph("\n"));
                 }
             }
         }
-    }
-    
-    public void abrirPDF(String rutaArchivo) {
-        try {
-            File pdfFile = new File(rutaArchivo);
-            if (pdfFile.exists()) {
-                if (Desktop.isDesktopSupported()) {
-                    Desktop.getDesktop().open(pdfFile);
-                } else {
-                    JOptionPane.showMessageDialog(null, "El sistema no soporta la apertura automática de archivos.");
+
+        // Tabla de cuotas
+        PdfPTable tabla = new PdfPTable(5);
+        tabla.setWidthPercentage(100);
+        tabla.addCell("N° Cuota");
+        tabla.addCell("Importe");
+        tabla.addCell("Vencimiento");
+        tabla.addCell("Recargo");
+        tabla.addCell("Estado");
+
+        String sqlCuotas = "SELECT num_cuota, importe_cuota, vencimiento, importe_actualizado, pago_realizado "
+                + "FROM cuotas WHERE id_credito = ?";
+
+        try (PreparedStatement pstmt = conexion.prepareStatement(sqlCuotas)) {
+            pstmt.setInt(1, idCredito);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    tabla.addCell(String.valueOf(rs.getInt("num_cuota")));
+                    tabla.addCell("$" + rs.getDouble("importe_cuota"));
+                    tabla.addCell(rs.getString("vencimiento"));
+                    tabla.addCell("$" + rs.getDouble("importe_actualizado"));
+                    tabla.addCell(rs.getBoolean("pago_realizado") ? "Pagada" : "Pendiente");
                 }
-            } else {
-                JOptionPane.showMessageDialog(null, "El archivo PDF no existe.");
             }
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(null, "Error al abrir el PDF: " + ex.getMessage());
+        }
+        documento.add(tabla);
+
+        // Espacio para firma
+        documento.add(new Paragraph("\n\n\n"));
+        documento.add(new Paragraph("______________________", fuenteNormal));
+        documento.add(new Paragraph("Firma", fuenteNormal));
+        documento.add(new Paragraph("\n"));
+        documento.add(new Paragraph("______________________", fuenteNormal));
+        documento.add(new Paragraph("Aclaración", fuenteNormal));
+        documento.add(new Paragraph("\n"));
+        documento.add(new Paragraph("______________________", fuenteNormal));
+        documento.add(new Paragraph("DNI", fuenteNormal));
+
+        JOptionPane.showMessageDialog(null, "PDF generado con éxito: " + rutaArchivo);
+
+        // Abrir el archivo PDF
+        abrirArchivoPDF(rutaArchivo);
+    } catch (DocumentException | IOException | SQLException e) {
+        JOptionPane.showMessageDialog(null, "Error al generar el PDF: " + e.getMessage());
+        e.printStackTrace();
+    } finally {
+        documento.close();
+        if (conexion != null) {
+            try {
+                conexion.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
+}
+
+private void abrirArchivoPDF(String rutaArchivo) {
+    try {
+        // Ejecutar el comando para abrir el PDF
+        File archivo = new File(rutaArchivo);
+        if (archivo.exists()) {
+            // Comando específico para el sistema operativo
+            String os = System.getProperty("os.name").toLowerCase();
+            if (os.contains("win")) {
+                // Windows
+                Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + rutaArchivo);
+            } else if (os.contains("mac")) {
+                // macOS
+                Runtime.getRuntime().exec("open " + rutaArchivo);
+            } else if (os.contains("nix") || os.contains("nux")) {
+                // Linux
+                Runtime.getRuntime().exec("xdg-open " + rutaArchivo);
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "El archivo PDF no existe: " + rutaArchivo);
+        }
+    } catch (IOException e) {
+        JOptionPane.showMessageDialog(null, "Error al abrir el archivo PDF: " + e.getMessage());
+        e.printStackTrace();
+    }
+}
+
 
     public int insertarCredito(JTextField dni_cliente, JTextPane observacion, JTextField monto, String fecha, int id_plan_pago) {
         Conexion objetoConexion = new Conexion();
