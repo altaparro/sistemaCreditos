@@ -312,7 +312,7 @@ public class FormCobrarCuota extends javax.swing.JFrame {
     }//GEN-LAST:event_buscarBtnActionPerformed
 
     private void cobrarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cobrarBtnActionPerformed
-     DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+    DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
     CobrarCuota objetoCobrarCuota = new CobrarCuota();
     boolean algunPagoProcesado = false;
     StringBuilder mensajeError = new StringBuilder();
@@ -392,6 +392,21 @@ public class FormCobrarCuota extends javax.swing.JFrame {
         buscarBtnActionPerformed(null);
         updateTotalCobrar();
         JOptionPane.showMessageDialog(this, "Todos los pagos se procesaron con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        
+        // Generar PDF después de procesar los pagos
+        String dni = dniTxt.getText();
+        String nombres = nombresTxt.getText();
+        String apellido = apellidoTxt.getText();
+        if (!dni.isEmpty()) {
+            try {
+                objetoCobrarCuota.generarPdf(dni, nombres, apellido);
+                JOptionPane.showMessageDialog(this, "PDF generado con éxito: cuotas_pagadas_" + dni + ".pdf", "PDF Generado", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Error al generar el PDF: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "No se pudo generar el PDF: DNI no disponible.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        }
     } else {
         JOptionPane.showMessageDialog(this, "No se seleccionó ningún pago para procesar.", "Aviso", JOptionPane.INFORMATION_MESSAGE);
     }
