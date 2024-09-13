@@ -81,6 +81,11 @@ public class FormPrincipal extends javax.swing.JFrame {
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 40, -1, -1));
 
         deudoresBtn.setText("DEUDORES");
+        deudoresBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deudoresBtnActionPerformed(evt);
+            }
+        });
         getContentPane().add(deudoresBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 240, 140, 60));
 
         pack();
@@ -114,6 +119,11 @@ public class FormPrincipal extends javax.swing.JFrame {
     private void salirBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_salirBtnActionPerformed
         System.exit(0);
     }//GEN-LAST:event_salirBtnActionPerformed
+
+    private void deudoresBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deudoresBtnActionPerformed
+       FormDeudores deudores = new FormDeudores();
+       deudores.setVisible(true);
+    }//GEN-LAST:event_deudoresBtnActionPerformed
 
     public static void main(String args[]) {
 
