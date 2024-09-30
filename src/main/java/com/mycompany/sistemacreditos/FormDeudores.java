@@ -24,6 +24,7 @@ public class FormDeudores extends javax.swing.JFrame {
         setupTable();
         loadData();
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
     }
 
     private void setupTable() {
@@ -39,15 +40,19 @@ public class FormDeudores extends javax.swing.JFrame {
                 + "FROM clientes c "
                 + "JOIN credito cr ON c.id = cr.id_cliente "
                 + "JOIN cuotas cu ON cr.num_credito = cu.id_credito "
-                + "WHERE cu.vencimiento < date('now') AND cu.pago_realizado = 0 "
+                + "WHERE date(strftime('%Y-%m-%d', substr(cu.vencimiento, 7, 4) || '-' || substr(cu.vencimiento, 4, 2) || '-' || substr(cu.vencimiento, 1, 2))) < date('now') "
+                + "AND cu.pago_realizado = 0 "
                 + "ORDER BY c.dni";
 
-        try (Connection conn = conexion.establecerConexion(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
+        try (
+                Connection conn = conexion.establecerConexion(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(query);) {
 
             DefaultTableModel model = (DefaultTableModel) table.getModel();
-            model.setRowCount(0); // Clear existing data
+            model.setRowCount(0); // Limpiar datos existentes
 
             while (rs.next()) {
+
+                double importeActualizado = Math.round(rs.getDouble("importe_actualizado") * 100.0) / 100.0;
                 Object[] row = {
                     rs.getString("dni"),
                     rs.getString("apellidos"),
@@ -55,8 +60,9 @@ public class FormDeudores extends javax.swing.JFrame {
                     rs.getInt("num_credito"),
                     rs.getInt("num_cuota"),
                     rs.getString("vencimiento"),
-                    rs.getDouble("importe_actualizado")
+                    importeActualizado
                 };
+
                 model.addRow(row);
             }
 
