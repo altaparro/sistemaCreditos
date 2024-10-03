@@ -31,7 +31,7 @@ public class CobrarCuota {
         Connection conexion = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
-        
+
         try {
             conexion = objetoConexion.establecerConexion();
             String sql = "SELECT c.num_credito, cu.num_cuota, cu.importe_cuota, p.monto, p.fecha_pago "
@@ -58,10 +58,6 @@ public class CobrarCuota {
             document.add(logo);
 
             // Datos del negocio
-            Font fuenteTitulo = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18, BaseColor.BLACK);
-            Paragraph titulo = new Paragraph("Deportes 7", fuenteTitulo);
-            titulo.setAlignment(Element.ALIGN_CENTER);
-            document.add(titulo);
 
             Font fuenteNormal = FontFactory.getFont(FontFactory.HELVETICA, 12, BaseColor.BLACK);
             document.add(new Paragraph("Dirección: Avenida 7 Número 2278", fuenteNormal));
@@ -69,7 +65,7 @@ public class CobrarCuota {
             document.add(new Paragraph("\n"));
 
             document.add(new Paragraph("Datos del Cliente:", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
-            document.add(new Paragraph("Nombre: "+ nombres + " " + apellido, fuenteNormal));
+            document.add(new Paragraph("Nombre: " + nombres + " " + apellido, fuenteNormal));
             document.add(new Paragraph("DNI: " + dni, fuenteNormal));
             document.add(new Paragraph("\n"));
 
@@ -117,10 +113,36 @@ public class CobrarCuota {
             total.setAlignment(Element.ALIGN_RIGHT);
             document.add(new Paragraph("\n"));
             document.add(total);
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
 
-            document.close();
+            //duplicado
+            // Agregar logo
+            document.add(logo);
+
+            // Datos del negocio
+
+            document.add(new Paragraph("Dirección: Avenida 7 Número 2278", fuenteNormal));
+            document.add(new Paragraph("Teléfono: (0221) 457-7707", fuenteNormal));
+            document.add(new Paragraph("\n"));
+
+            document.add(new Paragraph("Datos del Cliente:", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
+            document.add(new Paragraph("Nombre: " + nombres + " " + apellido, fuenteNormal));
+            document.add(new Paragraph("DNI: " + dni, fuenteNormal));
+            document.add(new Paragraph("\n"));
+
+            // Título del documento
+            title.setAlignment(Element.ALIGN_CENTER);
+            document.add(title);
+            document.add(new Paragraph("\n"));
+            document.add(table);
+
+            
             System.out.println("PDF generado: cuotas_pagadas_" + dni + ".pdf");
             String rutaArchivo = "cuotas_pagadas_" + dni + ".pdf";
+            document.add(new Paragraph("\n"));
+            document.add(total);
+            document.close();
             abrirArchivoPDF(rutaArchivo);
 
         } catch (Exception e) {
@@ -145,31 +167,31 @@ public class CobrarCuota {
     }
 
     private void abrirArchivoPDF(String rutaArchivo) {
-    try {
-        // Ejecutar el comando para abrir el PDF
-        File archivo = new File(rutaArchivo);
-        if (archivo.exists()) {
-            // Comando específico para el sistema operativo
-            String os = System.getProperty("os.name").toLowerCase();
-            if (os.contains("win")) {
-                // Windows
-                Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + rutaArchivo);
-            } else if (os.contains("mac")) {
-                // macOS
-                Runtime.getRuntime().exec("open " + rutaArchivo);
-            } else if (os.contains("nix") || os.contains("nux")) {
-                // Linux
-                Runtime.getRuntime().exec("xdg-open " + rutaArchivo);
+        try {
+            // Ejecutar el comando para abrir el PDF
+            File archivo = new File(rutaArchivo);
+            if (archivo.exists()) {
+                // Comando específico para el sistema operativo
+                String os = System.getProperty("os.name").toLowerCase();
+                if (os.contains("win")) {
+                    // Windows
+                    Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + rutaArchivo);
+                } else if (os.contains("mac")) {
+                    // macOS
+                    Runtime.getRuntime().exec("open " + rutaArchivo);
+                } else if (os.contains("nix") || os.contains("nux")) {
+                    // Linux
+                    Runtime.getRuntime().exec("xdg-open " + rutaArchivo);
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "El archivo PDF no existe: " + rutaArchivo);
             }
-        } else {
-            JOptionPane.showMessageDialog(null, "El archivo PDF no existe: " + rutaArchivo);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Error al abrir el archivo PDF: " + e.getMessage());
+            e.printStackTrace();
         }
-    } catch (IOException e) {
-        JOptionPane.showMessageDialog(null, "Error al abrir el archivo PDF: " + e.getMessage());
-        e.printStackTrace();
     }
-}
-    
+
     public void MostrarCuotasCliente(JTextField dni_buscar, JTable tablaCuotas) {
         Conexion objetoConexion = new Conexion();
         Connection conexion = null;

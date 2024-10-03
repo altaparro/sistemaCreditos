@@ -32,114 +32,156 @@ public class Creditos {
 
     private Map<String, Integer> planPagoMap = new HashMap<>();
 
-    public void generarPDFCredito(int idCredito) {
-        Conexion objetoConexion = new Conexion();
-        Connection conexion = null;
-        Document documento = new Document();
-        String rutaArchivo = "Credito_" + idCredito + ".pdf";
+  public void generarPDFCredito(int idCredito) {
+    Conexion objetoConexion = new Conexion();
+    Connection conexion = null;
+    Document documento = new Document();
+    String rutaArchivo = "Credito_" + idCredito + ".pdf";
 
-        try {
-            conexion = objetoConexion.establecerConexion();
-            PdfWriter.getInstance(documento, new FileOutputStream(rutaArchivo));
-            documento.open();
+    try {
+        conexion = objetoConexion.establecerConexion();
+        PdfWriter.getInstance(documento, new FileOutputStream(rutaArchivo));
+        documento.open();
 
-            // Agregar logo
-            Image logo = Image.getInstance("logo.png");
-            logo.scaleToFit(150, 150);
-            logo.setAlignment(Element.ALIGN_CENTER);
-            documento.add(logo);
+        // Agregar logo
+        Image logo = Image.getInstance("logo.png");
+        logo.scaleToFit(150, 150);
+        logo.setAlignment(Element.ALIGN_CENTER);
+        documento.add(logo);
 
-            // Datos del negocio
-            Font fuenteTitulo = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18, BaseColor.BLACK);
-            Paragraph titulo = new Paragraph("Deportes 7", fuenteTitulo);
-            titulo.setAlignment(Element.ALIGN_CENTER);
-            documento.add(titulo);
+        // Datos del negocio
+        Font fuenteNormal = FontFactory.getFont(FontFactory.HELVETICA, 12, BaseColor.BLACK);
+        documento.add(new Paragraph("Dirección: Avenida 7 Número 2278", fuenteNormal));
+        documento.add(new Paragraph("Teléfono: (0221) 457-7707", fuenteNormal));
+        documento.add(new Paragraph("\n"));
 
-            Font fuenteNormal = FontFactory.getFont(FontFactory.HELVETICA, 12, BaseColor.BLACK);
-            documento.add(new Paragraph("Dirección: Avenida 7 Número 2278", fuenteNormal));
-            documento.add(new Paragraph("Teléfono: (0221) 457-7707", fuenteNormal));
-            documento.add(new Paragraph("\n"));
+        // Datos del cliente y crédito
+        String sqlCliente = "SELECT c.dni, c.nombres, c.apellidos, cr.monto, cr.fecha, cr.observacion "
+                + "FROM clientes c "
+                + "JOIN credito cr ON c.id = cr.id_cliente "
+                + "WHERE cr.num_credito = ?";
 
-            // Datos del cliente y crédito
-            String sqlCliente = "SELECT c.dni, c.nombres, c.apellidos, cr.monto, cr.fecha, cr.observacion "
-                    + "FROM clientes c "
-                    + "JOIN credito cr ON c.id = cr.id_cliente "
-                    + "WHERE cr.num_credito = ?";
+        try (PreparedStatement pstmt = conexion.prepareStatement(sqlCliente)) {
+            pstmt.setInt(1, idCredito);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    documento.add(new Paragraph("Datos del Cliente:", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
+                    documento.add(new Paragraph("Nombre: " + rs.getString("nombres") + " " + rs.getString("apellidos"), fuenteNormal));
+                    documento.add(new Paragraph("DNI: " + rs.getString("dni"), fuenteNormal));
+                    documento.add(new Paragraph("\n"));
 
-            try (PreparedStatement pstmt = conexion.prepareStatement(sqlCliente)) {
-                pstmt.setInt(1, idCredito);
-                try (ResultSet rs = pstmt.executeQuery()) {
-                    if (rs.next()) {
-                        documento.add(new Paragraph("Datos del Cliente:", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
-                        documento.add(new Paragraph("Nombre: " + rs.getString("nombres") + " " + rs.getString("apellidos"), fuenteNormal));
-                        documento.add(new Paragraph("DNI: " + rs.getString("dni"), fuenteNormal));
-                        documento.add(new Paragraph("\n"));
-
-                        documento.add(new Paragraph("Datos del Crédito:", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
-                        documento.add(new Paragraph("Numero de credito: " + idCredito, fuenteNormal));
-                        documento.add(new Paragraph("Monto: $" + rs.getDouble("monto"), fuenteNormal));
-                        documento.add(new Paragraph("Fecha: " + rs.getString("fecha"), fuenteNormal));
-                        documento.add(new Paragraph("Observación: " + rs.getString("observacion"), fuenteNormal));
-                        documento.add(new Paragraph("\n"));
-                    }
-                }
-            }
-
-            // Tabla de cuotas
-            PdfPTable tabla = new PdfPTable(5);
-            tabla.setWidthPercentage(100);
-            tabla.addCell("N° Cuota");
-            tabla.addCell("Importe");
-            tabla.addCell("Vencimiento");
-            tabla.addCell("Recargo");
-            tabla.addCell("Estado");
-
-            String sqlCuotas = "SELECT num_cuota, importe_cuota, vencimiento, importe_actualizado, pago_realizado "
-                    + "FROM cuotas WHERE id_credito = ?";
-
-            try (PreparedStatement pstmt = conexion.prepareStatement(sqlCuotas)) {
-                pstmt.setInt(1, idCredito);
-                try (ResultSet rs = pstmt.executeQuery()) {
-                    while (rs.next()) {
-                        tabla.addCell(String.valueOf(rs.getInt("num_cuota")));
-                        tabla.addCell("$" + rs.getDouble("importe_cuota"));
-                        tabla.addCell(rs.getString("vencimiento"));
-                        tabla.addCell("$" + rs.getDouble("importe_actualizado"));
-                        tabla.addCell(rs.getBoolean("pago_realizado") ? "Pagada" : "Pendiente");
-                    }
-                }
-            }
-            documento.add(tabla);
-
-            // Espacio para firma
-            documento.add(new Paragraph("\n\n\n"));
-            documento.add(new Paragraph("______________________", fuenteNormal));
-            documento.add(new Paragraph("Firma", fuenteNormal));
-            documento.add(new Paragraph("\n"));
-            documento.add(new Paragraph("______________________", fuenteNormal));
-            documento.add(new Paragraph("Aclaración", fuenteNormal));
-            documento.add(new Paragraph("\n"));
-            documento.add(new Paragraph("______________________", fuenteNormal));
-            documento.add(new Paragraph("DNI", fuenteNormal));
-
-            JOptionPane.showMessageDialog(null, "PDF generado con éxito: " + rutaArchivo);
-
-            // Abrir el archivo PDF
-            abrirArchivoPDF(rutaArchivo);
-        } catch (DocumentException | IOException | SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al generar el PDF: " + e.getMessage());
-            e.printStackTrace();
-        } finally {
-            documento.close();
-            if (conexion != null) {
-                try {
-                    conexion.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
+                    documento.add(new Paragraph("Datos del Crédito:", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
+                    documento.add(new Paragraph("Numero de credito: " + idCredito, fuenteNormal));
+                    documento.add(new Paragraph("Monto: $" + rs.getDouble("monto"), fuenteNormal));
+                    documento.add(new Paragraph("Fecha: " + rs.getString("fecha"), fuenteNormal));
+                    documento.add(new Paragraph("Observación: " + rs.getString("observacion"), fuenteNormal));
+                    documento.add(new Paragraph("\n"));
                 }
             }
         }
+
+        // Tabla de cuotas
+        PdfPTable tabla = new PdfPTable(5);
+        tabla.setWidthPercentage(100);
+        tabla.addCell("N° Cuota");
+        tabla.addCell("Importe");
+        tabla.addCell("Vencimiento");
+        tabla.addCell("Recargo");
+        tabla.addCell("Estado");
+
+        String sqlCuotas = "SELECT num_cuota, importe_cuota, vencimiento, importe_actualizado, pago_realizado "
+                + "FROM cuotas WHERE id_credito = ?";
+
+        try (PreparedStatement pstmt = conexion.prepareStatement(sqlCuotas)) {
+            pstmt.setInt(1, idCredito);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    tabla.addCell(String.valueOf(rs.getInt("num_cuota")));
+                    tabla.addCell("$" + rs.getDouble("importe_cuota"));
+                    tabla.addCell(rs.getString("vencimiento"));
+                    tabla.addCell("$" + rs.getDouble("importe_actualizado"));
+                    tabla.addCell(rs.getBoolean("pago_realizado") ? "Pagada" : "Pendiente");
+                }
+            }
+        }
+        documento.add(tabla);
+        documento.add(new Paragraph("\n\n\n"));
+
+        // Texto legal
+        documento.add(new Paragraph(" Conforme al art 44 3° parrafo de la citada norma, el pago deberá hacerse efectivo en la moneda expresada. Se amplía el plazo de presentación a 6 años, según el art 36 Decreto Ley 5685/63. La Falta de pago en termino hará caducar todos los plazos, siento exigible desde ese momento el saldo, más intereses punitorios equivalentes a dos veces la tasa del Banco de La Nación Argentina (BNA) para operaciones en descubierto.", fuenteNormal));
+        documento.add(new Paragraph(" Acepto que el presente sea dado en garantía o se transfiera el crédito emergente. De optarse por la cesión del crédito, excepto que se modifique el domicilio de pago, podrá hacerse sin necesidad de notificacion. A los efectos de cumplir con el art. 36 de la Ley 24.240 se deja manifestado que el negocio causal del presente pagare es un cotrato de mutuo.", fuenteNormal));
+        
+        // Espacio para firma en la primera página
+        documento.add(new Paragraph("\n\n\n"));
+        documento.add(new Paragraph("______________________", fuenteNormal));
+        documento.add(new Paragraph("Firma", fuenteNormal));
+        documento.add(new Paragraph("\n"));
+        documento.add(new Paragraph("______________________", fuenteNormal));
+        documento.add(new Paragraph("Aclaración", fuenteNormal));
+        documento.add(new Paragraph("\n"));
+        documento.add(new Paragraph("______________________", fuenteNormal));
+        documento.add(new Paragraph("DNI", fuenteNormal));
+
+        // Nueva página (duplicado)
+        documento.newPage();
+        
+        // Agregar el logo en la segunda página
+        documento.add(logo);
+
+        // Datos del negocio (duplicados en la segunda página)
+        documento.add(new Paragraph("Dirección: Avenida 7 Número 2278", fuenteNormal));
+        documento.add(new Paragraph("Teléfono: (0221) 457-7707", fuenteNormal));
+        documento.add(new Paragraph("\n"));
+
+        // Datos del cliente y crédito (duplicados en la segunda página)
+        try (PreparedStatement pstmt = conexion.prepareStatement(sqlCliente)) {
+            pstmt.setInt(1, idCredito);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    documento.add(new Paragraph("Datos del Cliente:", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
+                    documento.add(new Paragraph("Nombre: " + rs.getString("nombres") + " " + rs.getString("apellidos"), fuenteNormal));
+                    documento.add(new Paragraph("DNI: " + rs.getString("dni"), fuenteNormal));
+                    documento.add(new Paragraph("\n"));
+
+                    documento.add(new Paragraph("Datos del Crédito:", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
+                    documento.add(new Paragraph("Numero de credito: " + idCredito, fuenteNormal));
+                    documento.add(new Paragraph("Monto: $" + rs.getDouble("monto"), fuenteNormal));
+                    documento.add(new Paragraph("Fecha: " + rs.getString("fecha"), fuenteNormal));
+                    documento.add(new Paragraph("Observación: " + rs.getString("observacion"), fuenteNormal));
+                    documento.add(new Paragraph("\n"));
+                }
+            }
+        }
+
+        // Tabla de cuotas (duplicada en la segunda página)
+        documento.add(tabla);
+        documento.add(new Paragraph("\n\n\n"));
+
+        // Texto legal (duplicado en la segunda página)
+        documento.add(new Paragraph(" Conforme al art 44 3° parrafo de la citada norma, el pago deberá hacerse efectivo en la moneda expresada. Se amplía el plazo de presentación a 6 años, según el art 36 Decreto Ley 5685/63. La Falta de pago en termino hará caducar todos los plazos, siento exigible desde ese momento el saldo, más intereses punitorios equivalentes a dos veces la tasa del Banco de La Nación Argentina (BNA) para operaciones en descubierto.", fuenteNormal));
+        documento.add(new Paragraph(" Acepto que el presente sea dado en garantía o se transfiera el crédito emergente. De optarse por la cesión del crédito, excepto que se modifique el domicilio de pago, podrá hacerse sin necesidad de notificacion. A los efectos de cumplir con el art. 36 de la Ley 24.240 se deja manifestado que el negocio causal del presente pagare es un cotrato de mutuo.", fuenteNormal));
+
+        // En la segunda página NO agregamos el espacio para firma, aclaración y DNI.
+
+        JOptionPane.showMessageDialog(null, "PDF generado con éxito: " + rutaArchivo);
+
+        // Abrir el archivo PDF
+        abrirArchivoPDF(rutaArchivo);
+    } catch (DocumentException | IOException | SQLException e) {
+        JOptionPane.showMessageDialog(null, "Error al generar el PDF: " + e.getMessage());
+        e.printStackTrace();
+    } finally {
+        documento.close();
+        if (conexion != null) {
+            try {
+                conexion.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
+}
+
 
     private void abrirArchivoPDF(String rutaArchivo) {
         try {

@@ -171,7 +171,7 @@ public class FormGenerarCredito extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
 
-        if (dniTxt.equals("")||dniTxt.equals(null)) {
+        if (dniTxt.getText().equals("") || observacionesText.getText().equals("") || montoTxt.getText().equals("")) {
             JOptionPane.showMessageDialog(this, "Complete todos los campos obligatorios");
         } else {
             Creditos objetoCreditos = new Creditos();
@@ -200,8 +200,12 @@ public class FormGenerarCredito extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-        Creditos objetoCreditos = new Creditos();
-        objetoCreditos.MostrarCliente(buscarTxt, dniTxt, nombresTxt, apellidoTxt);
+        if (buscarTxt.getText().equals("")) {
+            JOptionPane.showMessageDialog(this, "Complete todos los campos obligatorios");
+        } else {
+            Creditos objetoCreditos = new Creditos();
+            objetoCreditos.MostrarCliente(buscarTxt, dniTxt, nombresTxt, apellidoTxt);
+        }
     }//GEN-LAST:event_btnBuscarActionPerformed
 
     public static void main(String args[]) {
