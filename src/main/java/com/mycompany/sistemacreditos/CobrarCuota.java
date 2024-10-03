@@ -18,6 +18,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.stream.Stream;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -31,6 +33,8 @@ public class CobrarCuota {
         Connection conexion = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+        String fechaPago = sdf.format(new Date());
 
         try {
             conexion = objetoConexion.establecerConexion();
@@ -40,11 +44,12 @@ public class CobrarCuota {
                     + "INNER JOIN credito c ON cu.id_credito = c.num_credito "
                     + "INNER JOIN clientes cl ON c.id_cliente = cl.id "
                     + "WHERE cl.dni = ? "
-                    + "AND p.fecha_pago = DATE('now') "
+                    + "AND p.fecha_pago = ? "
                     + // Filtrar por pagos realizados hoy
                     "ORDER BY c.num_credito, cu.num_cuota";
             pstmt = conexion.prepareStatement(sql);
             pstmt.setString(1, dni);
+            pstmt.setString(2, fechaPago);
             rs = pstmt.executeQuery();
 
             Document document = new Document();
@@ -58,7 +63,6 @@ public class CobrarCuota {
             document.add(logo);
 
             // Datos del negocio
-
             Font fuenteNormal = FontFactory.getFont(FontFactory.HELVETICA, 12, BaseColor.BLACK);
             document.add(new Paragraph("Dirección: Avenida 7 Número 2278", fuenteNormal));
             document.add(new Paragraph("Teléfono: (0221) 457-7707", fuenteNormal));
@@ -98,9 +102,9 @@ public class CobrarCuota {
             while (rs.next()) {
                 table.addCell(new PdfPCell(new Phrase(rs.getString("num_credito"))));
                 table.addCell(new PdfPCell(new Phrase(rs.getString("num_cuota"))));
-                table.addCell(new PdfPCell(new Phrase(String.format("%.2f", rs.getDouble("importe_cuota")))));
+                table.addCell(new PdfPCell(new Phrase("$" + String.format("%.2f", rs.getDouble("importe_cuota")))));
                 double montoPagado = rs.getDouble("monto");
-                table.addCell(new PdfPCell(new Phrase(String.format("%.2f", montoPagado))));
+                table.addCell(new PdfPCell(new Phrase("$" + String.format("%.2f", montoPagado))));
                 table.addCell(new PdfPCell(new Phrase(rs.getString("fecha_pago"))));
                 totalPagado += montoPagado;
             }
@@ -121,7 +125,6 @@ public class CobrarCuota {
             document.add(logo);
 
             // Datos del negocio
-
             document.add(new Paragraph("Dirección: Avenida 7 Número 2278", fuenteNormal));
             document.add(new Paragraph("Teléfono: (0221) 457-7707", fuenteNormal));
             document.add(new Paragraph("\n"));
@@ -137,7 +140,6 @@ public class CobrarCuota {
             document.add(new Paragraph("\n"));
             document.add(table);
 
-            
             System.out.println("PDF generado: cuotas_pagadas_" + dni + ".pdf");
             String rutaArchivo = "cuotas_pagadas_" + dni + ".pdf";
             document.add(new Paragraph("\n"));
@@ -297,12 +299,15 @@ public class CobrarCuota {
                         pstmtActualizar.setInt(1, idCuota);
                         pstmtActualizar.executeUpdate();
                     }
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+                    String fechaPago = sdf.format(new Date());
 
                     // Registrar el pago en la tabla pagos con la fecha actual
-                    String sqlInsertarPago = "INSERT INTO pagos (id_cuota, monto, fecha_pago) VALUES (?, ?, CURRENT_DATE)";
+                    String sqlInsertarPago = "INSERT INTO pagos (id_cuota, monto, fecha_pago) VALUES (?, ?, ?)";
                     pstmtInsertarPago = conexion.prepareStatement(sqlInsertarPago);
                     pstmtInsertarPago.setInt(1, idCuota);
                     pstmtInsertarPago.setDouble(2, montoPago);
+                    pstmtInsertarPago.setString(3, fechaPago);
                     int filasInsertadas = pstmtInsertarPago.executeUpdate();
 
                     if (filasInsertadas > 0) {
