@@ -18,7 +18,6 @@ public class Conexion {
      try {
          Class.forName("org.sqlite.JDBC");
          conectar = DriverManager.getConnection(cadena);
-         JOptionPane.showMessageDialog(null, "Se conecto la base correctamente");
      } catch (Exception e) {
         JOptionPane.showMessageDialog(null, "Error en la conexion de la base de datos, "+ e.toString());
      }
