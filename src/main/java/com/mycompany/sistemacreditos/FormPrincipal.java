@@ -33,7 +33,7 @@ public class FormPrincipal extends javax.swing.JFrame {
 
         // Añadir logo
         ImageIcon logoIcon = new ImageIcon("logo.png");
-        Image scaledImage = logoIcon.getImage().getScaledInstance(150, 100, Image.SCALE_SMOOTH);
+        Image scaledImage = logoIcon.getImage().getScaledInstance(283, 66, Image.SCALE_SMOOTH);
         JLabel logoLabel = new JLabel(new ImageIcon(scaledImage));
         titlePanel.add(logoLabel, createGridBagConstraints(0, 0, 1, 1, GridBagConstraints.CENTER));
 
