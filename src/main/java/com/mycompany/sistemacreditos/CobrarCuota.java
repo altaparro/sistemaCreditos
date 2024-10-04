@@ -228,6 +228,7 @@ public class CobrarCuota {
                     rs.getInt("num_cuota"),
                     rs.getDouble("importe_cuota"),
                     rs.getDouble("importe_actualizado"),
+                    rs.getString("vencimiento"),
                     false, // Columna de pago total (inicialmente false)
                     0.0 // Columna de pago parcial (inicialmente 0.0)
                 });

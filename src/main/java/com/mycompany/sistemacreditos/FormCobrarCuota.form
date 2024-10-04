@@ -190,18 +190,24 @@
         <Component class="javax.swing.JTable" name="jTable1">
           <Properties>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-              <Table columnCount="7" rowCount="4">
+              <Table columnCount="8" rowCount="4">
                 <Column editable="true" title="ID CREDITO" type="java.lang.Object"/>
                 <Column editable="true" title="ID CUOTA" type="java.lang.Object"/>
                 <Column editable="true" title="NUM CUOTA" type="java.lang.Integer"/>
                 <Column editable="true" title="IMPORTE CUOTA" type="java.lang.Double"/>
                 <Column editable="true" title="IMPORTE ACTUALIZADO" type="java.lang.Double"/>
+                <Column editable="true" title="FECHA VENCE" type="java.lang.Object"/>
                 <Column editable="true" title="PAGO TOTAL" type="java.lang.Boolean"/>
                 <Column editable="true" title="PAGO PARCIAL" type="java.lang.Double"/>
               </Table>
             </Property>
             <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
               <TableColumnModel selectionModel="0">
+                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                  <Title/>
+                  <Editor/>
+                  <Renderer/>
+                </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title/>
                   <Editor/>

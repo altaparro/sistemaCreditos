@@ -50,7 +50,7 @@ public class FormCobrarCuota extends javax.swing.JFrame {
         });
 
         // Configuración para la columna de Pago Total (6ta columna en el índice 5)
-        int pagoTotalColumnIndex = 5;
+        int pagoTotalColumnIndex = 6;
         TableColumn pagoTotalColumn = jTable1.getColumnModel().getColumn(pagoTotalColumnIndex);
         pagoTotalColumn.setCellEditor(new DefaultCellEditor(new JCheckBox()));
         pagoTotalColumn.setCellRenderer(new DefaultTableCellRenderer() {
@@ -64,7 +64,7 @@ public class FormCobrarCuota extends javax.swing.JFrame {
         });
 
         // Configuración para la columna de Pago Parcial (7ma columna en el índice 6)
-        int pagoParcialColumnIndex = 6;
+        int pagoParcialColumnIndex = 7;
         TableColumn pagoParcialColumn = jTable1.getColumnModel().getColumn(pagoParcialColumnIndex);
         JTextField pagoParcialTextField = new JTextField();
         pagoParcialTextField.addActionListener(e -> updateTotalCobrar());
@@ -106,7 +106,7 @@ public class FormCobrarCuota extends javax.swing.JFrame {
         DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
         double total = 0.0;
         for (int i = 0; i < model.getRowCount(); i++) {
-            Object pagoTotalObj = model.getValueAt(i, 5);
+            Object pagoTotalObj = model.getValueAt(i, 6);
             boolean pagoTotal = pagoTotalObj instanceof Boolean && (Boolean) pagoTotalObj;
 
             if (pagoTotal) {
@@ -121,7 +121,7 @@ public class FormCobrarCuota extends javax.swing.JFrame {
                     }
                 }
             } else {
-                Object pagoParcialObj = model.getValueAt(i, 6);
+                Object pagoParcialObj = model.getValueAt(i, 7);
                 if (pagoParcialObj instanceof Number) {
                     total += ((Number) pagoParcialObj).doubleValue();
                 } else if (pagoParcialObj instanceof String && !((String) pagoParcialObj).isEmpty()) {
@@ -198,17 +198,17 @@ public class FormCobrarCuota extends javax.swing.JFrame {
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null}
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "ID CREDITO", "ID CUOTA", "NUM CUOTA", "IMPORTE CUOTA", "IMPORTE ACTUALIZADO", "PAGO TOTAL", "PAGO PARCIAL"
+                "ID CREDITO", "ID CUOTA", "NUM CUOTA", "IMPORTE CUOTA", "IMPORTE ACTUALIZADO", "FECHA VENCE", "PAGO TOTAL", "PAGO PARCIAL"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.Object.class, java.lang.Integer.class, java.lang.Double.class, java.lang.Double.class, java.lang.Boolean.class, java.lang.Double.class
+                java.lang.Object.class, java.lang.Object.class, java.lang.Integer.class, java.lang.Double.class, java.lang.Double.class, java.lang.Object.class, java.lang.Boolean.class, java.lang.Double.class
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -319,7 +319,7 @@ public class FormCobrarCuota extends javax.swing.JFrame {
         boolean huboErrores = false;
 
         for (int i = 0; i < model.getRowCount(); i++) {
-            Object pagoTotalObj = model.getValueAt(i, 5);
+            Object pagoTotalObj = model.getValueAt(i, 6);
             boolean pagoTotal = pagoTotalObj instanceof Boolean && (Boolean) pagoTotalObj;
 
             Double montoPago = 0.0;
@@ -341,7 +341,7 @@ public class FormCobrarCuota extends javax.swing.JFrame {
             if (pagoTotal) {
                 montoPago = importeActualizado;
             } else {
-                Object pagoParcialObj = model.getValueAt(i, 6);
+                Object pagoParcialObj = model.getValueAt(i, 7);
                 if (pagoParcialObj instanceof Number) {
                     montoPago = ((Number) pagoParcialObj).doubleValue();
                 } else if (pagoParcialObj instanceof String) {

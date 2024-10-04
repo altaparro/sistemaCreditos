@@ -47,8 +47,8 @@ public class ActualizarCuotas {
                 // Calcular el número de días de retraso
                 long diasRetraso = ChronoUnit.DAYS.between(fechaVencimiento, fechaActual);
 
-                // Incrementar el importe_actualizado en un 2% por cada día de retraso
-                double nuevoImporte = importeActualizado * Math.pow(1.02, diasRetraso);
+                // Incrementar el importe_actualizado en un 1% por cada día de retraso
+                double nuevoImporte = importeActualizado * Math.pow(1.01, diasRetraso);
 
                 // Actualizar el importe_actualizado en la base de datos
                 pstmtUpdate.setDouble(1, nuevoImporte);
