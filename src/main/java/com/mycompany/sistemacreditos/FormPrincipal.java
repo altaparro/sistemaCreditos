@@ -1,10 +1,20 @@
 package com.mycompany.sistemacreditos;
 
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -21,7 +31,6 @@ public class FormPrincipal extends javax.swing.JFrame {
     }
 
     private void initComponentsCustom() {
-        // Configuración de la ventana principal
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Sistema de Créditos - Deportes 7");
         getContentPane().setBackground(new java.awt.Color(240, 240, 240));
@@ -60,7 +69,7 @@ public class FormPrincipal extends javax.swing.JFrame {
 
         // Botón Salir
         JButton salirBtn = createStyledButton("SALIR");
-        salirBtn.setBackground(new java.awt.Color(255, 99, 71));
+        salirBtn.setBackground(new java.awt.Color(220, 53, 69));
         add(salirBtn, createGridBagConstraints(1, 3, 1, 1, GridBagConstraints.CENTER));
 
         // Añadir ActionListeners a los botones (mantén los existentes)
@@ -76,30 +85,75 @@ public class FormPrincipal extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }
 
-    private JButton createStyledButton(String text) {
-        JButton button = new JButton(text);
-        button.setFont(new java.awt.Font("Segoe UI", Font.BOLD, 14));
-        button.setForeground(java.awt.Color.WHITE);
-        button.setBackground(text.equals("SALIR") ? new java.awt.Color(255, 99, 71) : new java.awt.Color(0, 123, 255));
-        button.setFocusPainted(false);
-        button.setBorderPainted(false);
-        button.setPreferredSize(new java.awt.Dimension(180, 60));
+private JButton createStyledButton(String text) {
+    JButton button = new JButton(text) {
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // Add hover effect
-        button.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(new java.awt.Color(0, 105, 217));
-                button.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-            }
+            int width = getWidth();
+            int height = getHeight();
 
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(text.equals("SALIR") ? new java.awt.Color(255, 99, 71) : new java.awt.Color(0, 123, 255));
-                button.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-            }
-        });
+            // Crear gradiente para el fondo
+            Color topColor = text.equals("SALIR") ? new Color(255, 99, 71) : new Color(30, 144, 255);
+            Color bottomColor = text.equals("SALIR") ? new Color(220, 20, 60) : new Color(0, 91, 234);
+            GradientPaint gradient = new GradientPaint(0, 0, topColor, 0, height, bottomColor);
+            g2.setPaint(gradient);
+            g2.fillRoundRect(0, 0, width, height, 10, 10);
 
-        return button;
-    }
+            // Agregar brillo en la parte superior
+            g2.setPaint(new Color(255, 255, 255, 50));
+            g2.fillRoundRect(0, 0, width, height / 2, 10, 10);
+
+            // Dibujar borde
+            g2.setColor(new Color(0, 0, 0, 50));
+            g2.drawRoundRect(0, 0, width - 1, height - 1, 10, 10);
+
+            // Agregar sombra en la parte inferior
+            g2.setPaint(new Color(0, 0, 0, 30));
+            g2.fillRoundRect(0, height - 5, width, 5, 10, 10);
+
+            g2.dispose();
+
+            super.paintComponent(g);
+        }
+    };
+
+    button.setFont(new Font("Segoe UI", Font.BOLD, 14));
+    button.setForeground(Color.WHITE);
+    button.setContentAreaFilled(false);
+    button.setBorderPainted(false);
+    button.setFocusPainted(false);
+    button.setPreferredSize(new Dimension(180, 60));
+
+    // Agregar efectos de hover y presión
+    button.addMouseListener(new MouseAdapter() {
+        @Override
+        public void mouseEntered(MouseEvent e) {
+            button.setBackground(text.equals("SALIR") ? new Color(255, 69, 0) : new Color(0, 114, 255));
+            button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+            button.setBackground(text.equals("SALIR") ? new Color(255, 99, 71) : new Color(30, 144, 255));
+            button.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            button.setBackground(text.equals("SALIR") ? new Color(220, 20, 60) : new Color(0, 91, 234));
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            button.setBackground(text.equals("SALIR") ? new Color(255, 99, 71) : new Color(30, 144, 255));
+        }
+    });
+
+    return button;
+}
 
     private GridBagConstraints createGridBagConstraints(int gridx, int gridy, int gridwidth, int gridheight, int anchor) {
         GridBagConstraints gbc = new GridBagConstraints();

@@ -9,8 +9,8 @@ import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 public class Clientes {
-    
-     public void MostrarClientesGeneral(JTable tablaClientes) {
+
+    public void MostrarClientesGeneral(JTable tablaClientes) {
         Conexion objetoConexion = new Conexion();
 
         DefaultTableModel modelo = new DefaultTableModel();
@@ -125,8 +125,22 @@ public class Clientes {
         Conexion objetoConexion = new Conexion();
         String consultaCliente = "INSERT INTO clientes(dni, nombres, apellidos, localidad, barrio, calle, numero, entre_calles, email, fecha_alta, calificacion) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
         String consultaTelefono = "INSERT INTO telefonos(id_cliente, cod_area, numero) VALUES (?,?,?)";
+        String consultaDni = "SELECT COUNT(*) FROM clientes WHERE dni = ?"; // Verificación del DNI duplicado
 
         try {
+            // Verificar si el DNI ya existe
+            PreparedStatement psVerificarDni = objetoConexion.establecerConexion().prepareStatement(consultaDni);
+            psVerificarDni.setString(1, dni.getText());
+            ResultSet rsDni = psVerificarDni.executeQuery();
+            rsDni.next(); // Mover el cursor al primer resultado
+            int cuentaDni = rsDni.getInt(1); // Obtener el número de registros con el mismo DNI
+
+            if (cuentaDni > 0) {
+                // Si el DNI ya existe, mostrar un mensaje y detener el proceso
+                JOptionPane.showMessageDialog(null, "El cliente con DNI " + dni.getText() + " ya está registrado.");
+                return; // Salir del método sin insertar
+            }
+
             // Insertar el cliente
             PreparedStatement psCliente = objetoConexion.establecerConexion().prepareStatement(consultaCliente, Statement.RETURN_GENERATED_KEYS);
             psCliente.setString(1, dni.getText());

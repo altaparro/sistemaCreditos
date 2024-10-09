@@ -260,6 +260,7 @@ public class CobrarCuota {
         PreparedStatement pstmtConsulta = null;
         PreparedStatement pstmtActualizar = null;
         PreparedStatement pstmtInsertarPago = null;
+        PreparedStatement pstmtActualizarUltimoMov = null;  // Nuevo PreparedStatement
         ResultSet rs = null;
         boolean pagoExitoso = false;
 
@@ -300,6 +301,7 @@ public class CobrarCuota {
                         pstmtActualizar.setInt(1, idCuota);
                         pstmtActualizar.executeUpdate();
                     }
+
                     SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
                     String fechaPago = sdf.format(new Date());
 
@@ -312,6 +314,13 @@ public class CobrarCuota {
                     int filasInsertadas = pstmtInsertarPago.executeUpdate();
 
                     if (filasInsertadas > 0) {
+                        // Actualizar el campo 'ultimo_mov' con la fecha actual
+                        String sqlActualizarUltimoMov = "UPDATE cuotas SET ultimo_mov = ? WHERE id_cuota = ?";
+                        pstmtActualizarUltimoMov = conexion.prepareStatement(sqlActualizarUltimoMov);
+                        pstmtActualizarUltimoMov.setString(1, fechaPago);  // Actualizamos con la fecha actual
+                        pstmtActualizarUltimoMov.setInt(2, idCuota);
+                        pstmtActualizarUltimoMov.executeUpdate();
+
                         pagoExitoso = true;
                         conexion.commit();  // Confirmar la transacción
                     } else {
@@ -347,6 +356,9 @@ public class CobrarCuota {
                 if (pstmtInsertarPago != null) {
                     pstmtInsertarPago.close();
                 }
+                if (pstmtActualizarUltimoMov != null) {
+                    pstmtActualizarUltimoMov.close();  // Cerrar el nuevo PreparedStatement
+                }
                 if (conexion != null) {
                     conexion.setAutoCommit(true);  // Restaurar el auto-commit
                     conexion.close();
@@ -361,5 +373,4 @@ public class CobrarCuota {
             javax.swing.JOptionPane.showMessageDialog(null, "Pago procesado correctamente.");
         }
     }
-
 }

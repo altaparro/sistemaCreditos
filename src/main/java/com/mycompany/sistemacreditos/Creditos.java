@@ -108,8 +108,8 @@ public class Creditos {
         documento.add(new Paragraph("\n\n\n"));
 
         // Texto legal
-        documento.add(new Paragraph(" Conforme al art 44 3° parrafo de la citada norma, el pago deberá hacerse efectivo en la moneda expresada. Se amplía el plazo de presentación a 6 años, según el art 36 Decreto Ley 5685/63. La Falta de pago en termino hará caducar todos los plazos, siento exigible desde ese momento el saldo, más intereses punitorios equivalentes a dos veces la tasa del Banco de La Nación Argentina (BNA) para operaciones en descubierto.", fuenteNormal));
-        documento.add(new Paragraph(" Acepto que el presente sea dado en garantía o se transfiera el crédito emergente. De optarse por la cesión del crédito, excepto que se modifique el domicilio de pago, podrá hacerse sin necesidad de notificacion. A los efectos de cumplir con el art. 36 de la Ley 24.240 se deja manifestado que el negocio causal del presente pagare es un cotrato de mutuo.", fuenteNormal));
+        documento.add(new Paragraph(" Conforme al artículo 44, tercer párrafo de la citada norma, el pago deberá hacerse efectivo en la moneda expresada. Se amplía el plazo de presentación a 6 años, según el artículo 36 del Decreto Ley 5685/63. La falta de pago en término hará caducar todos los plazos, siendo exigible desde ese momento el saldo, más intereses punitorios equivalentes a dos veces la tasa del Banco de la Nación Argentina (BNA) para operaciones en descubierto.", fuenteNormal));
+        documento.add(new Paragraph(" Acepto que el presente sea dado en garantía o se transfiera el crédito emergente. De optarse por la cesión del crédito, excepto que se modifique el domicilio de pago, podrá hacerse sin necesidad de notificación. A los efectos de cumplir con el artículo 36 de la Ley 24.240, se deja manifestado que el negocio causal del presente pagaré es un contrato de mutuo.", fuenteNormal));
         
         // Espacio para firma en la primera página
         documento.add(new Paragraph("\n\n\n"));
@@ -209,124 +209,126 @@ public class Creditos {
         }
     }
 
-    public int insertarCredito(JTextField dni_cliente, JTextPane observacion, JTextField monto, String fecha, int id_plan_pago) {
-        Conexion objetoConexion = new Conexion();
-        Connection conexion = null;
-        PreparedStatement psBuscarCliente = null;
-        PreparedStatement psInsertarCredito = null;
-        PreparedStatement psInsertarCuota = null;
-        PreparedStatement psPlanPago = null;
-        ResultSet rs = null;
-        int idCreditoInsertado = -1;
+  public int insertarCredito(JTextField dni_cliente, JTextPane observacion, JTextField monto, String fecha, int id_plan_pago) {
+    Conexion objetoConexion = new Conexion();
+    Connection conexion = null;
+    PreparedStatement psBuscarCliente = null;
+    PreparedStatement psInsertarCredito = null;
+    PreparedStatement psInsertarCuota = null;
+    PreparedStatement psPlanPago = null;
+    ResultSet rs = null;
+    int idCreditoInsertado = -1;
 
-        try {
-            conexion = objetoConexion.establecerConexion();
-            conexion.setAutoCommit(false);  // Iniciar transacción
+    try {
+        conexion = objetoConexion.establecerConexion();
+        conexion.setAutoCommit(false);  // Iniciar transacción
 
-            // Buscar el ID del cliente usando el DNI
-            String consultaIDCliente = "SELECT id FROM clientes WHERE dni = ?";
-            psBuscarCliente = conexion.prepareStatement(consultaIDCliente);
-            psBuscarCliente.setString(1, dni_cliente.getText());
-            rs = psBuscarCliente.executeQuery();
+        // Buscar el ID del cliente usando el DNI
+        String consultaIDCliente = "SELECT id FROM clientes WHERE dni = ?";
+        psBuscarCliente = conexion.prepareStatement(consultaIDCliente);
+        psBuscarCliente.setString(1, dni_cliente.getText());
+        rs = psBuscarCliente.executeQuery();
 
-            if (rs.next()) {
-                int id_cliente = rs.getInt("id");
+        if (rs.next()) {
+            int id_cliente = rs.getInt("id");
 
-                // Obtener la cantidad de cuotas, el interés y el tipo de plan de pago seleccionado
-                String consultaPlanPago = "SELECT cant_cuotas, interes, tipo FROM plan_pago WHERE id_plan_pago = ?";
-                psPlanPago = conexion.prepareStatement(consultaPlanPago);
-                psPlanPago.setInt(1, id_plan_pago);
-                ResultSet rsPlan = psPlanPago.executeQuery();
+            // Obtener la cantidad de cuotas, el interés y el tipo de plan de pago seleccionado
+            String consultaPlanPago = "SELECT cant_cuotas, interes, tipo FROM plan_pago WHERE id_plan_pago = ?";
+            psPlanPago = conexion.prepareStatement(consultaPlanPago);
+            psPlanPago.setInt(1, id_plan_pago);
+            ResultSet rsPlan = psPlanPago.executeQuery();
 
-                if (rsPlan.next()) {
-                    int cant_cuotas = rsPlan.getInt("cant_cuotas");
-                    double interes = rsPlan.getDouble("interes");
-                    String tipo = rsPlan.getString("tipo");
+            if (rsPlan.next()) {
+                int cant_cuotas = rsPlan.getInt("cant_cuotas");
+                double interes = rsPlan.getDouble("interes");
+                String tipo = rsPlan.getString("tipo");
 
-                    // Insertar el crédito
-                    String consultaCreditos = "INSERT INTO credito(id_cliente, observacion, monto, fecha, id_plan_pago) VALUES (?,?,?,?,?)";
-                    psInsertarCredito = conexion.prepareStatement(consultaCreditos, Statement.RETURN_GENERATED_KEYS);
-                    psInsertarCredito.setInt(1, id_cliente);
-                    psInsertarCredito.setString(2, observacion.getText());
-                    psInsertarCredito.setDouble(3, Double.parseDouble(monto.getText()));
-                    psInsertarCredito.setString(4, fecha);
-                    psInsertarCredito.setInt(5, id_plan_pago);
-                    psInsertarCredito.executeUpdate();
+                // Insertar el crédito
+                String consultaCreditos = "INSERT INTO credito(id_cliente, observacion, monto, fecha, id_plan_pago) VALUES (?,?,?,?,?)";
+                psInsertarCredito = conexion.prepareStatement(consultaCreditos, Statement.RETURN_GENERATED_KEYS);
+                psInsertarCredito.setInt(1, id_cliente);
+                psInsertarCredito.setString(2, observacion.getText());
+                psInsertarCredito.setDouble(3, Double.parseDouble(monto.getText()));
+                psInsertarCredito.setString(4, fecha);
+                psInsertarCredito.setInt(5, id_plan_pago);
+                psInsertarCredito.executeUpdate();
 
-                    // Obtener el ID del crédito recién creado
-                    rs = psInsertarCredito.getGeneratedKeys();
-                    if (rs.next()) {
-                        idCreditoInsertado = rs.getInt(1);
+                // Obtener el ID del crédito recién creado
+                rs = psInsertarCredito.getGeneratedKeys();
+                if (rs.next()) {
+                    idCreditoInsertado = rs.getInt(1);
 
-                        // Calcular el importe de cada cuota y aplicar el interés
-                        double importeCuotaBase = Double.parseDouble(monto.getText()) / cant_cuotas;
-                        double importeCuotaConInteres = importeCuotaBase * (1 + interes / 100);
+                    // Calcular el importe de cada cuota y aplicar el interés
+                    double importeCuotaBase = Double.parseDouble(monto.getText()) / cant_cuotas;
+                    double importeCuotaConInteres = importeCuotaBase * (1 + interes / 100);
 
-                        // Insertar las cuotas
-                        String consultaCuotas = "INSERT INTO cuotas(id_cliente, id_credito, id_plan_pago, num_cuota, importe_cuota, importe_actualizado, vencimiento, pago_realizado) VALUES (?,?,?,?,?,?,?,?)";
-                        psInsertarCuota = conexion.prepareStatement(consultaCuotas);
+                    // Insertar las cuotas
+                    String consultaCuotas = "INSERT INTO cuotas(id_cliente, id_credito, id_plan_pago, num_cuota, importe_cuota, importe_actualizado, vencimiento, ultimo_mov, pago_realizado) VALUES (?,?,?,?,?,?,?,?,?)";
+                    psInsertarCuota = conexion.prepareStatement(consultaCuotas);
 
-                        LocalDate fechaVencimiento = LocalDate.parse(fecha, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-                        for (int i = 0; i < cant_cuotas; i++) {
-                            psInsertarCuota.setInt(1, id_cliente);
-                            psInsertarCuota.setInt(2, idCreditoInsertado);
-                            psInsertarCuota.setInt(3, id_plan_pago);
-                            psInsertarCuota.setInt(4, i + 1);
-                            psInsertarCuota.setDouble(5, importeCuotaConInteres);
-                            psInsertarCuota.setDouble(6, importeCuotaConInteres);
-                            psInsertarCuota.setString(7, fechaVencimiento.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
-                            psInsertarCuota.setBoolean(8, tipo.equalsIgnoreCase("primera en el momento") && i == 0);
-                            psInsertarCuota.executeUpdate();
+                    LocalDate fechaVencimiento = LocalDate.parse(fecha, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+                    for (int i = 0; i < cant_cuotas; i++) {
+                        psInsertarCuota.setInt(1, id_cliente);
+                        psInsertarCuota.setInt(2, idCreditoInsertado);
+                        psInsertarCuota.setInt(3, id_plan_pago);
+                        psInsertarCuota.setInt(4, i + 1);
+                        psInsertarCuota.setDouble(5, importeCuotaConInteres);
+                        psInsertarCuota.setDouble(6, importeCuotaConInteres);
+                        String fechaVencimientoStr = fechaVencimiento.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+                        psInsertarCuota.setString(7, fechaVencimientoStr);
+                        psInsertarCuota.setString(8, fechaVencimientoStr);  // Establecer ultimo_mov igual a vencimiento
+                        psInsertarCuota.setBoolean(9, tipo.equalsIgnoreCase("primera en el momento") && i == 0);
+                        psInsertarCuota.executeUpdate();
 
-                            fechaVencimiento = fechaVencimiento.plusMonths(1);
-                        }
-
-                        conexion.commit();  // Confirmar transacción
-                        JOptionPane.showMessageDialog(null, "Crédito y cuotas creadas exitosamente");
+                        fechaVencimiento = fechaVencimiento.plusMonths(1);
                     }
-                } else {
-                    throw new SQLException("Plan de pago no encontrado");
+
+                    conexion.commit();  // Confirmar transacción
+                    JOptionPane.showMessageDialog(null, "Crédito y cuotas creadas exitosamente");
                 }
             } else {
-                throw new SQLException("Cliente no encontrado");
+                throw new SQLException("Plan de pago no encontrado");
+            }
+        } else {
+            throw new SQLException("Cliente no encontrado");
+        }
+    } catch (SQLException e) {
+        try {
+            if (conexion != null) {
+                conexion.rollback();  // Deshacer transacción en caso de error
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        JOptionPane.showMessageDialog(null, "Error al insertar el crédito: " + e.getMessage());
+        e.printStackTrace();
+    } finally {
+        try {
+            if (rs != null) {
+                rs.close();
+            }
+            if (psBuscarCliente != null) {
+                psBuscarCliente.close();
+            }
+            if (psInsertarCredito != null) {
+                psInsertarCredito.close();
+            }
+            if (psInsertarCuota != null) {
+                psInsertarCuota.close();
+            }
+            if (psPlanPago != null) {
+                psPlanPago.close();
+            }
+            if (conexion != null) {
+                conexion.setAutoCommit(true);  // Restaurar auto-commit
+                conexion.close();
             }
         } catch (SQLException e) {
-            try {
-                if (conexion != null) {
-                    conexion.rollback();  // Deshacer transacción en caso de error
-                }
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-            JOptionPane.showMessageDialog(null, "Error al insertar el crédito: " + e.getMessage());
             e.printStackTrace();
-        } finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-                if (psBuscarCliente != null) {
-                    psBuscarCliente.close();
-                }
-                if (psInsertarCredito != null) {
-                    psInsertarCredito.close();
-                }
-                if (psInsertarCuota != null) {
-                    psInsertarCuota.close();
-                }
-                if (psPlanPago != null) {
-                    psPlanPago.close();
-                }
-                if (conexion != null) {
-                    conexion.setAutoCommit(true);  // Restaurar auto-commit
-                    conexion.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
-        return idCreditoInsertado;
     }
+    return idCreditoInsertado;
+}
 
     public void MostrarCliente(JTextField dni_buscar, JTextField dni_cliente, JTextField nombres, JTextField apellidos) {
         Conexion objetoConexion = new Conexion();

@@ -7,6 +7,6 @@ package com.mycompany.sistemacreditos;
 public class SistemaCreditos {
 
     public static void main(String[] args) {
-        new FormPrincipal().setVisible(true);
+        new FormLogin().setVisible(true);
     }
 }
