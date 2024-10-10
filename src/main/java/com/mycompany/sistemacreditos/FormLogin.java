@@ -29,7 +29,6 @@ public class FormLogin extends javax.swing.JFrame {
     }
 
     private void initComponentsCustom() {
-        // Configuración de la ventana principal
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Sistema de Créditos - Deportes 7");
         getContentPane().setBackground(new java.awt.Color(240, 240, 240));
@@ -54,34 +53,33 @@ public class FormLogin extends javax.swing.JFrame {
         add(titlePanel, createGridBagConstraints(0, 0, 3, 1, GridBagConstraints.CENTER));
 
         // Etiquetas y campos de texto
-        jLabel1 = new JLabel("USUARIO:");
-        jLabel1.setFont(new java.awt.Font("Segoe UI", Font.BOLD, 18));
-        add(jLabel1, createGridBagConstraints(0, 1, 1, 1, GridBagConstraints.EAST));
+        JLabel usuarioLabel = new JLabel("USUARIO:");
+        usuarioLabel.setFont(new java.awt.Font("Segoe UI", Font.BOLD, 18));
+        add(usuarioLabel, createGridBagConstraints(0, 1, 1, 1, GridBagConstraints.EAST));
 
         usuarioTxt = new javax.swing.JTextField(15);
-        usuarioTxt.setPreferredSize(new java.awt.Dimension(250, 40));
+        usuarioTxt.setPreferredSize(new java.awt.Dimension(250, 30));
         add(usuarioTxt, createGridBagConstraints(1, 1, 2, 1, GridBagConstraints.WEST));
 
-        jLabel2 = new JLabel("CONTRASEÑA:");
-        jLabel2.setFont(new java.awt.Font("Segoe UI", Font.BOLD, 18));
-        add(jLabel2, createGridBagConstraints(0, 2, 1, 1, GridBagConstraints.EAST));
+        JLabel passwordLabel = new JLabel("CONTRASEÑA:");
+        passwordLabel.setFont(new java.awt.Font("Segoe UI", Font.BOLD, 18));
+        add(passwordLabel, createGridBagConstraints(0, 2, 1, 1, GridBagConstraints.EAST));
 
         passwordTxt = new javax.swing.JPasswordField(15);
-        passwordTxt.setPreferredSize(new java.awt.Dimension(250, 40));
+        passwordTxt.setPreferredSize(new java.awt.Dimension(250, 30));
         add(passwordTxt, createGridBagConstraints(1, 2, 2, 1, GridBagConstraints.WEST));
 
-        // Botón de ingreso con el nuevo diseño 3D
-        ingresarBtn = createStyledButton("INGRESAR");
+        // Botón de ingreso
+        JButton ingresarBtn = createStyledButton("INGRESAR");
         ingresarBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 ingresarBtnActionPerformed(evt);
             }
         });
-
         add(ingresarBtn, createGridBagConstraints(1, 3, 1, 1, GridBagConstraints.CENTER));
 
         pack();
-        setLocationRelativeTo(null); // Centrar la ventana en la pantalla
+        setLocationRelativeTo(null);
     }
 
     private JButton createStyledButton(String text) {
@@ -97,6 +95,15 @@ public class FormLogin extends javax.swing.JFrame {
                 // Crear gradiente para el fondo
                 Color topColor = new Color(30, 144, 255);
                 Color bottomColor = new Color(0, 91, 234);
+
+                if (getModel().isPressed()) {
+                    topColor = new Color(0, 114, 255);
+                    bottomColor = new Color(0, 71, 214);
+                } else if (getModel().isRollover()) {
+                    topColor = new Color(60, 174, 255);
+                    bottomColor = new Color(30, 121, 254);
+                }
+
                 GradientPaint gradient = new GradientPaint(0, 0, topColor, 0, height, bottomColor);
                 g2.setPaint(gradient);
                 g2.fillRoundRect(0, 0, width, height, 10, 10);
@@ -119,35 +126,24 @@ public class FormLogin extends javax.swing.JFrame {
             }
         };
 
-        button.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        button.setFont(new Font("Segoe UI", Font.BOLD, 14));
         button.setForeground(Color.WHITE);
         button.setContentAreaFilled(false);
         button.setBorderPainted(false);
         button.setFocusPainted(false);
-        button.setPreferredSize(new Dimension(150, 70));
+        button.setPreferredSize(new Dimension(160, 40));
 
-        // Agregar efectos de hover y presión
         button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                button.setBackground(new Color(0, 114, 255));
+                button.getModel().setRollover(true);
                 button.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                button.setBackground(new Color(30, 144, 255));
+                button.getModel().setRollover(false);
                 button.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                button.setBackground(new Color(0, 91, 234));
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                button.setBackground(new Color(30, 144, 255));
             }
         });
 
