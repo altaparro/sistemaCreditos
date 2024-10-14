@@ -4,6 +4,8 @@
  */
 package com.mycompany.sistemacreditos;
 
+import javax.swing.ImageIcon;
+
 /**
  *
  * @author matias
@@ -15,6 +17,8 @@ public class FormDetalleCuota extends javax.swing.JFrame {
      */
     public FormDetalleCuota() {
         initComponents();
+        ImageIcon icon = new ImageIcon("icono.png"); // Cambia la ruta según tu estructura de proyecto
+        setIconImage(icon.getImage());
     }
 
     /**

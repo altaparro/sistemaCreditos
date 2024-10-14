@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -26,9 +27,11 @@ public class FormListadoClientes extends javax.swing.JFrame {
         // Muestra los clientes inicialmente
         Clientes objetoClientes = new Clientes();
         objetoClientes.MostrarClientesGeneral(tablaClientes);
+        ImageIcon icon = new ImageIcon("icono.png"); // Cambia la ruta según tu estructura de proyecto
+        setIconImage(icon.getImage());
     }
 
-   private void initComponentsCustom() {
+    private void initComponentsCustom() {
         setTitle("Listado de Clientes");
         getContentPane().setBackground(new Color(240, 240, 240));
         setLayout(new GridBagLayout());
@@ -36,7 +39,7 @@ public class FormListadoClientes extends javax.swing.JFrame {
         // Panel para el título y la búsqueda
         JPanel titlePanel = new JPanel(new GridBagLayout());
         titlePanel.setOpaque(false);
-        
+
         // Título
         JLabel titleLabel = new JLabel("LISTADO DE CLIENTES");
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
@@ -49,10 +52,10 @@ public class FormListadoClientes extends javax.swing.JFrame {
         titlePanel.add(jLabel2, createGridBagConstraints(0, 1, 1, 1, GridBagConstraints.WEST));
 
         // Inicializar buscarTxt
-        buscarTxt = new JTextField(20); 
+        buscarTxt = new JTextField(20);
         buscarTxt.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
-                String textoBusqueda = buscarTxt.getText(); 
+                String textoBusqueda = buscarTxt.getText();
                 Clientes objetoClientes = new Clientes();
                 objetoClientes.MostrarClientes(tablaClientes, textoBusqueda);
             }
@@ -63,10 +66,10 @@ public class FormListadoClientes extends javax.swing.JFrame {
 
         // Tabla de clientes
         tablaClientes = new JTable(new DefaultTableModel(
-            new Object[][] {},
-            new String[] { "DNI", "Nombre", "Apellido", "Teléfono", "Email", "Dirección", "Ciudad", "Provincia", "Código Postal", "Fecha de Nacimiento", "Género", "Notas" } // Nombres de las columnas
+                new Object[][]{},
+                new String[]{"DNI", "Nombre", "Apellido", "Teléfono", "Email", "Dirección", "Ciudad", "Provincia", "Código Postal", "Fecha de Nacimiento", "Género", "Notas"} // Nombres de las columnas
         ));
-        
+
         // Cambiar la fuente de la tabla
         tablaClientes.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         tablaClientes.setRowHeight(30); // Ajustar la altura de las filas
@@ -84,7 +87,7 @@ public class FormListadoClientes extends javax.swing.JFrame {
         headerRenderer.setForeground(Color.WHITE); // Color del texto
         headerRenderer.setFont(new Font("Segoe UI", Font.BOLD, 16)); // Fuente para el encabezado
         headerRenderer.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Color.WHITE));
-        
+
         // Aplicar el renderer a los encabezados
         tablaClientes.getTableHeader().setDefaultRenderer(headerRenderer);
 
@@ -93,7 +96,7 @@ public class FormListadoClientes extends javax.swing.JFrame {
             @Override
             public java.awt.Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 java.awt.Component cell = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                
+
                 if (isSelected) {
                     cell.setBackground(new Color(0, 102, 204)); // Color de selección
                     cell.setForeground(Color.WHITE);

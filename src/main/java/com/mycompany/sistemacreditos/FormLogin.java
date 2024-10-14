@@ -26,6 +26,8 @@ public class FormLogin extends javax.swing.JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setSize(500, 500);
+        ImageIcon icon = new ImageIcon("icono.png"); // Cambia la ruta según tu estructura de proyecto
+        setIconImage(icon.getImage());
     }
 
     private void initComponentsCustom() {

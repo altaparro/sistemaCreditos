@@ -5,34 +5,126 @@
 package com.mycompany.sistemacreditos;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import java.sql.*;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.RowFilter;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
 
 public class FormDeudores extends javax.swing.JFrame {
 
     private JTable table;
     private JScrollPane scrollPane;
     private Conexion conexion;
+    private JTextField buscarTxt;
 
     public FormDeudores() {
-        initComponents();
+        initComponentsCustom();
         conexion = new Conexion();
         setupTable();
         loadData();
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
+        ImageIcon icon = new ImageIcon("icono.png"); // Cambia la ruta según tu estructura de proyecto
+        setIconImage(icon.getImage());
+    }
+
+    private void initComponentsCustom() {
+        setTitle("Listado de Cuotas Vencidas");
+        getContentPane().setBackground(new Color(240, 240, 240));
+        setLayout(new GridBagLayout());
+
+        // Panel para el título y la búsqueda
+        JPanel titlePanel = new JPanel(new GridBagLayout());
+        titlePanel.setOpaque(false);
+
+        // Título
+        JLabel titleLabel = new JLabel("LISTADO DE CUOTAS VENCIDAS");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        titleLabel.setForeground(new Color(0, 102, 204));
+        titlePanel.add(titleLabel, createGridBagConstraints(0, 0, 1, 1, GridBagConstraints.CENTER));
+
+        // Campo de búsqueda
+        JLabel searchLabel = new JLabel("BUSCAR:");
+        searchLabel.setFont(new Font("sansserif", Font.BOLD, 14));
+        titlePanel.add(searchLabel, createGridBagConstraints(0, 1, 1, 1, GridBagConstraints.WEST));
+
+        buscarTxt = new JTextField(20);
+        buscarTxt.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                String textoBusqueda = buscarTxt.getText();
+                filterTable(textoBusqueda);
+            }
+        });
+        titlePanel.add(buscarTxt, createGridBagConstraints(0, 2, 1, 1, GridBagConstraints.WEST));
+
+        add(titlePanel, createGridBagConstraints(0, 0, 1, 1, GridBagConstraints.CENTER));
+
+        // Tabla
+        table = new JTable();
+        setupTableDesign();
+
+        scrollPane = new JScrollPane(table);
+        scrollPane.setPreferredSize(new Dimension(1200, 400));
+        add(scrollPane, createGridBagConstraints(0, 1, 1, 1, GridBagConstraints.CENTER));
+
+        pack();
     }
 
     private void setupTable() {
-        // Cambiamos el orden de las columnas para que DNI aparezca primero
         String[] columnNames = {"DNI", "APELLIDO", "NOMBRES", "NUM CREDITO", "NUM CUOTA", "FECHA VENCIMIENTO", "MONTO CUOTA"};
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
-        table = new JTable(model);
-        jScrollPane1.setViewportView(table);
+        table.setModel(model);
+    }
+
+    private void setupTableDesign() {
+        table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        table.setRowHeight(30);
+        table.setFillsViewportHeight(true);
+
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            TableColumn column = table.getColumnModel().getColumn(i);
+            column.setPreferredWidth(150);
+        }
+
+        DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer();
+        headerRenderer.setBackground(new Color(0, 102, 204));
+        headerRenderer.setForeground(Color.WHITE);
+        headerRenderer.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        headerRenderer.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Color.WHITE));
+
+        table.getTableHeader().setDefaultRenderer(headerRenderer);
+
+        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public java.awt.Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                java.awt.Component cell = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+                if (isSelected) {
+                    cell.setBackground(new Color(0, 102, 204));
+                    cell.setForeground(Color.WHITE);
+                } else {
+                    cell.setBackground(row % 2 == 0 ? new Color(220, 220, 220) : Color.WHITE);
+                    cell.setForeground(Color.BLACK);
+                }
+                return cell;
+            }
+        });
     }
 
     private void loadData() {
@@ -44,14 +136,12 @@ public class FormDeudores extends javax.swing.JFrame {
                 + "AND cu.pago_realizado = 0 "
                 + "ORDER BY c.dni";
 
-        try (
-                Connection conn = conexion.establecerConexion(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(query);) {
+        try (Connection conn = conexion.establecerConexion(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
 
             DefaultTableModel model = (DefaultTableModel) table.getModel();
-            model.setRowCount(0); // Limpiar datos existentes
+            model.setRowCount(0);
 
             while (rs.next()) {
-
                 double importeActualizado = Math.round(rs.getDouble("importe_actualizado") * 100.0) / 100.0;
                 Object[] row = {
                     rs.getString("dni"),
@@ -62,7 +152,6 @@ public class FormDeudores extends javax.swing.JFrame {
                     rs.getString("vencimiento"),
                     importeActualizado
                 };
-
                 model.addRow(row);
             }
 
@@ -76,11 +165,33 @@ public class FormDeudores extends javax.swing.JFrame {
         }
     }
 
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
+    private void filterTable(String searchText) {
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
+        table.setRowSorter(sorter);
+
+        if (searchText.length() == 0) {
+            sorter.setRowFilter(null);
+        } else {
+            try {
+                sorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchText));
+            } catch (java.util.regex.PatternSyntaxException pse) {
+                System.err.println("Bad regex pattern");
+            }
+        }
+    }
+
+    private GridBagConstraints createGridBagConstraints(int gridx, int gridy, int gridwidth, int gridheight, int anchor) {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = gridx;
+        gbc.gridy = gridy;
+        gbc.gridwidth = gridwidth;
+        gbc.gridheight = gridheight;
+        gbc.anchor = anchor;
+        gbc.insets = new java.awt.Insets(10, 10, 10, 10);
+        return gbc;
+    }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {

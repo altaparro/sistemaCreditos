@@ -1,7 +1,12 @@
 package com.mycompany.sistemacreditos;
 
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
+import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -14,11 +19,27 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
 public class FormCobrarCuota extends javax.swing.JFrame {
+
     public FormCobrarCuota() {
         initComponents();
+        ImageIcon icon = new ImageIcon("icono.png"); // Cambia la ruta según tu estructura de proyecto
+        setIconImage(icon.getImage());
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
+        jTable1.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        for (int i = 0; i < jTable1.getColumnCount(); i++) {
+            TableColumn column = jTable1.getColumnModel().getColumn(i);
+            column.setPreferredWidth(150); // Ajusta el ancho de todas las columnas
+        }
+        // Personaliza el renderer para los encabezados
+        DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer();
+        headerRenderer.setBackground(new Color(0, 102, 204)); // Color del encabezado (igual que el título)
+        headerRenderer.setForeground(Color.WHITE); // Color del texto
+        headerRenderer.setFont(new Font("Segoe UI", Font.BOLD, 16)); // Fuente para el encabezado
+        headerRenderer.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Color.WHITE));
 
+        // Aplicar el renderer a los encabezados
+        jTable1.getTableHeader().setDefaultRenderer(headerRenderer);
         // Configuración de la tabla
         configurarTabla();
 
@@ -29,6 +50,7 @@ public class FormCobrarCuota extends javax.swing.JFrame {
             }
         });
     }
+
 
     private void configurarTabla() {
         int importeActualizadoColumnIndex = 4;
@@ -133,9 +155,6 @@ public class FormCobrarCuota extends javax.swing.JFrame {
         }
         totalCobrarTxt.setText(String.format("%.2f", total));
     }
-    
-  
-
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -170,11 +189,12 @@ public class FormCobrarCuota extends javax.swing.JFrame {
             }
         });
 
-        buscarBtn.setBackground(new java.awt.Color(0, 102, 204));
-        buscarBtn.setForeground(new java.awt.Color(240, 240, 240));
+        buscarBtn.setBackground(new java.awt.Color(30, 144, 255));
+        buscarBtn.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        buscarBtn.setForeground(new java.awt.Color(255, 255, 255));
         buscarBtn.setText("BUSCAR");
         buscarBtn.setAlignmentX(0.5F);
-        buscarBtn.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        buscarBtn.setBorder(null);
         buscarBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buscarBtnActionPerformed(evt);
@@ -196,7 +216,15 @@ public class FormCobrarCuota extends javax.swing.JFrame {
 
         apellidoTxt.setEditable(false);
 
+        cobrarBtn.setBackground(new java.awt.Color(30, 144, 255));
+        cobrarBtn.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        cobrarBtn.setForeground(new java.awt.Color(255, 255, 255));
         cobrarBtn.setText("COBRAR");
+        cobrarBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                cobrarBtnMouseEntered(evt);
+            }
+        });
         cobrarBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cobrarBtnActionPerformed(evt);
@@ -222,6 +250,10 @@ public class FormCobrarCuota extends javax.swing.JFrame {
                 return types [columnIndex];
             }
         });
+        jTable1.setFocusable(false);
+        jTable1.setRowHeight(25);
+        jTable1.setSelectionBackground(new java.awt.Color(0, 120, 215));
+        jTable1.getTableHeader().setReorderingAllowed(false);
         jScrollPane2.setViewportView(jTable1);
 
         jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
@@ -271,7 +303,7 @@ public class FormCobrarCuota extends javax.swing.JFrame {
                             .addGap(18, 18, 18)
                             .addComponent(totalCobrarTxt)
                             .addGap(280, 280, 280)
-                            .addComponent(cobrarBtn))))
+                            .addComponent(cobrarBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addGap(32, 32, 32))
         );
         layout.setVerticalGroup(
@@ -418,6 +450,11 @@ public class FormCobrarCuota extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "No se seleccionó ningún pago para procesar.", "Aviso", JOptionPane.INFORMATION_MESSAGE);
         }
     }//GEN-LAST:event_cobrarBtnActionPerformed
+
+    private void cobrarBtnMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cobrarBtnMouseEntered
+       cobrarBtn.setBackground(new java.awt.Color(0, 105, 217));
+       cobrarBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+    }//GEN-LAST:event_cobrarBtnMouseEntered
 
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {

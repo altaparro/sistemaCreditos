@@ -8,12 +8,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-
 public class FormCalculadora extends javax.swing.JFrame {
-
 
     public FormCalculadora() {
         initComponents();
@@ -21,8 +20,9 @@ public class FormCalculadora extends javax.swing.JFrame {
         setLocationRelativeTo(null);
         Creditos objetoCreditos = new Creditos();
         objetoCreditos.LlenarPlanPagoComboBox(planPagosComboBox);
+        ImageIcon icon = new ImageIcon("icono.png"); // Cambia la ruta según tu estructura de proyecto
+        setIconImage(icon.getImage());
     }
-
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -104,66 +104,72 @@ public class FormCalculadora extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-private void calcularCuota(java.awt.event.ActionEvent evt) {
-    Conexion conexion = new Conexion(); // Instancia de tu clase de conexión
-    Connection conn = null;
-    PreparedStatement stmt = null;
-    ResultSet rs = null;
-    
-    try {
-        // Obtén el importe ingresado
-        double importe = Double.parseDouble(importeTxt.getText());
+    private void calcularCuota(java.awt.event.ActionEvent evt) {
+        Conexion conexion = new Conexion(); // Instancia de tu clase de conexión
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
 
-        // Obtén el plan de pago seleccionado
-        String planSeleccionado = (String) planPagosComboBox.getSelectedItem();
-        
-        if (planSeleccionado != null && !planSeleccionado.isEmpty()) {
-            // Separa el ID del plan de la descripción (asumiendo que el ID está antes del guion)
-            String[] partesPlan = planSeleccionado.split(" - ");
-            int idPlanPago = Integer.parseInt(partesPlan[0]);
-
-            // Consulta a la base de datos para obtener el interés y la cantidad de cuotas del plan
-            String sql = "SELECT interes, cant_cuotas FROM plan_pago WHERE id_plan_pago = ?";
-            conn = conexion.establecerConexion(); // Conectar a la base de datos
-            stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, idPlanPago); // Pasar el ID del plan de pago
-            rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                double interes = rs.getDouble("interes");
-                int cantCuotas = rs.getInt("cant_cuotas");
-
-                // Calcular el importe con el interés aplicado
-                double importeConInteres = importe * (1 + (interes / 100));
-
-                // Calcular el importe por cuota
-                double importePorCuota = importeConInteres / cantCuotas;
-
-                // Mostrar el importe de la cuota en el campo correspondiente
-                importeCuotaTxt.setText(String.format("%.2f", importePorCuota));
-            } else {
-                JOptionPane.showMessageDialog(this, "No se encontró el plan de pago en la base de datos.");
-            }
-        } else {
-            JOptionPane.showMessageDialog(this, "Seleccione un plan de pago válido.");
-        }
-    } catch (NumberFormatException e) {
-        JOptionPane.showMessageDialog(this, "Ingrese un importe válido.");
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(this, "Error al consultar la base de datos: " + e.getMessage());
-    } finally {
-        // Cerrar los recursos
         try {
-            if (rs != null) rs.close();
-            if (stmt != null) stmt.close();
-            if (conn != null) conn.close();
+            // Obtén el importe ingresado
+            double importe = Double.parseDouble(importeTxt.getText());
+
+            // Obtén el plan de pago seleccionado
+            String planSeleccionado = (String) planPagosComboBox.getSelectedItem();
+
+            if (planSeleccionado != null && !planSeleccionado.isEmpty()) {
+                // Separa el ID del plan de la descripción (asumiendo que el ID está antes del guion)
+                String[] partesPlan = planSeleccionado.split(" - ");
+                int idPlanPago = Integer.parseInt(partesPlan[0]);
+
+                // Consulta a la base de datos para obtener el interés y la cantidad de cuotas del plan
+                String sql = "SELECT interes, cant_cuotas FROM plan_pago WHERE id_plan_pago = ?";
+                conn = conexion.establecerConexion(); // Conectar a la base de datos
+                stmt = conn.prepareStatement(sql);
+                stmt.setInt(1, idPlanPago); // Pasar el ID del plan de pago
+                rs = stmt.executeQuery();
+
+                if (rs.next()) {
+                    double interes = rs.getDouble("interes");
+                    int cantCuotas = rs.getInt("cant_cuotas");
+
+                    // Calcular el importe con el interés aplicado
+                    double importeConInteres = importe * (1 + (interes / 100));
+
+                    // Calcular el importe por cuota
+                    double importePorCuota = importeConInteres / cantCuotas;
+
+                    // Mostrar el importe de la cuota en el campo correspondiente
+                    importeCuotaTxt.setText(String.format("%.2f", importePorCuota));
+                } else {
+                    JOptionPane.showMessageDialog(this, "No se encontró el plan de pago en la base de datos.");
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Seleccione un plan de pago válido.");
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Ingrese un importe válido.");
         } catch (SQLException e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al consultar la base de datos: " + e.getMessage());
+        } finally {
+            // Cerrar los recursos
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
-}
 
-    
+
     private void calcularBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_calcularBtnActionPerformed
         calcularCuota(evt);
     }//GEN-LAST:event_calcularBtnActionPerformed

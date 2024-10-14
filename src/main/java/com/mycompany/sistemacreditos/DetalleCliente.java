@@ -4,6 +4,8 @@
  */
 package com.mycompany.sistemacreditos;
 
+import javax.swing.ImageIcon;
+
 /**
  *
  * @author Matias
@@ -15,6 +17,8 @@ public class DetalleCliente extends javax.swing.JFrame {
      */
     public DetalleCliente() {
         initComponents();
+        ImageIcon icon = new ImageIcon("icono.png"); // Cambia la ruta según tu estructura de proyecto
+        setIconImage(icon.getImage());
     }
 
     /**

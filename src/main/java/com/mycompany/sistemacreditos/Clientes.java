@@ -1,7 +1,9 @@
 package com.mycompany.sistemacreditos;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -123,26 +125,32 @@ public class Clientes {
 
     public void InsertarCliente(JTextField dni, JTextField nombres, JTextField apellidos, JTextField localidad, JTextField barrio, JTextField calle, JTextField numero, JTextField entre_calles, JTextField email, String fecha_alta, int calificacion, JTextField cod_area1, JTextField numero1, JTextField cod_area2, JTextField numero2, JTextField cod_area3, JTextField numero3) {
         Conexion objetoConexion = new Conexion();
-        String consultaCliente = "INSERT INTO clientes(dni, nombres, apellidos, localidad, barrio, calle, numero, entre_calles, email, fecha_alta, calificacion) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
-        String consultaTelefono = "INSERT INTO telefonos(id_cliente, cod_area, numero) VALUES (?,?,?)";
-        String consultaDni = "SELECT COUNT(*) FROM clientes WHERE dni = ?"; // Verificación del DNI duplicado
+        Connection conexion = null;
+        PreparedStatement psVerificarDni = null;
+        PreparedStatement psCliente = null;
+        PreparedStatement psTelefono = null;
+        ResultSet rsDni = null;
+        ResultSet rs = null;
 
         try {
-            // Verificar si el DNI ya existe
-            PreparedStatement psVerificarDni = objetoConexion.establecerConexion().prepareStatement(consultaDni);
-            psVerificarDni.setString(1, dni.getText());
-            ResultSet rsDni = psVerificarDni.executeQuery();
-            rsDni.next(); // Mover el cursor al primer resultado
-            int cuentaDni = rsDni.getInt(1); // Obtener el número de registros con el mismo DNI
+            conexion = objetoConexion.establecerConexion();
+            conexion.setAutoCommit(false);  // Start transaction
 
+            // Verificar si el DNI ya existe
+            String consultaDni = "SELECT COUNT(*) FROM clientes WHERE dni = ?";
+            psVerificarDni = conexion.prepareStatement(consultaDni);
+            psVerificarDni.setString(1, dni.getText());
+            rsDni = psVerificarDni.executeQuery();
+            rsDni.next();
+            int cuentaDni = rsDni.getInt(1);
             if (cuentaDni > 0) {
-                // Si el DNI ya existe, mostrar un mensaje y detener el proceso
                 JOptionPane.showMessageDialog(null, "El cliente con DNI " + dni.getText() + " ya está registrado.");
-                return; // Salir del método sin insertar
+                return;
             }
 
             // Insertar el cliente
-            PreparedStatement psCliente = objetoConexion.establecerConexion().prepareStatement(consultaCliente, Statement.RETURN_GENERATED_KEYS);
+            String consultaCliente = "INSERT INTO clientes(dni, nombres, apellidos, localidad, barrio, calle, numero, entre_calles, email, fecha_alta, calificacion) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
+            psCliente = conexion.prepareStatement(consultaCliente, Statement.RETURN_GENERATED_KEYS);
             psCliente.setString(1, dni.getText());
             psCliente.setString(2, nombres.getText());
             psCliente.setString(3, apellidos.getText());
@@ -154,44 +162,63 @@ public class Clientes {
             psCliente.setString(9, email.getText());
             psCliente.setString(10, fecha_alta);
             psCliente.setInt(11, calificacion);
-
             psCliente.executeUpdate();
 
             // Obtener el ID del cliente insertado
-            ResultSet rs = psCliente.getGeneratedKeys();
+            rs = psCliente.getGeneratedKeys();
             if (rs.next()) {
                 int idCliente = rs.getInt(1);
-
                 // Insertar los números de teléfono
-                PreparedStatement psTelefono = objetoConexion.establecerConexion().prepareStatement(consultaTelefono);
+                String consultaTelefono = "INSERT INTO telefonos(id_cliente, cod_area, numero) VALUES (?,?,?)";
+                psTelefono = conexion.prepareStatement(consultaTelefono);
 
                 // Teléfono 1
-                psTelefono.setInt(1, idCliente);
-                psTelefono.setString(2, cod_area1.getText());
-                psTelefono.setString(3, numero1.getText());
-                psTelefono.addBatch();
+                insertarTelefono(psTelefono, idCliente, cod_area1, numero1);
 
                 // Teléfono 2
-                psTelefono.setInt(1, idCliente);
-                psTelefono.setString(2, cod_area2.getText());
-                psTelefono.setString(3, numero2.getText());
-                psTelefono.addBatch();
+                insertarTelefono(psTelefono, idCliente, cod_area2, numero2);
 
                 // Teléfono 3
-                psTelefono.setInt(1, idCliente);
-                psTelefono.setString(2, cod_area3.getText());
-                psTelefono.setString(3, numero3.getText());
-                psTelefono.addBatch();
+                insertarTelefono(psTelefono, idCliente, cod_area3, numero3);
 
                 psTelefono.executeBatch();
             }
 
+            conexion.commit();  // Commit transaction
             JOptionPane.showMessageDialog(null, "Cliente y teléfonos guardados correctamente");
         } catch (Exception e) {
+            try {
+                if (conexion != null) {
+                    conexion.rollback();
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
             JOptionPane.showMessageDialog(null, "No se pudo guardar el cliente: " + e.toString());
+            e.printStackTrace();
         } finally {
-            objetoConexion.cerrarConexion();
+            cerrarRecursos(rsDni, rs, psVerificarDni, psCliente, psTelefono, conexion);
         }
     }
 
+    private void insertarTelefono(PreparedStatement ps, int idCliente, JTextField codArea, JTextField numero) throws SQLException {
+        if (!codArea.getText().isEmpty() && !numero.getText().isEmpty()) {
+            ps.setInt(1, idCliente);
+            ps.setString(2, codArea.getText());
+            ps.setString(3, numero.getText());
+            ps.addBatch();
+        }
+    }
+
+    private void cerrarRecursos(AutoCloseable... recursos) {
+        for (AutoCloseable recurso : recursos) {
+            if (recurso != null) {
+                try {
+                    recurso.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 }

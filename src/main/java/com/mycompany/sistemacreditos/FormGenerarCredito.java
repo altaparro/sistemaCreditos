@@ -27,6 +27,8 @@ public class FormGenerarCredito extends javax.swing.JFrame {
         setLocationRelativeTo(null);
         Creditos objetoCreditos = new Creditos();
         objetoCreditos.LlenarPlanPagoComboBox(planPagoComboBox);
+                ImageIcon icon = new ImageIcon("icono.png"); // Cambia la ruta según tu estructura de proyecto
+        setIconImage(icon.getImage());
     }
     
     private void initComponentsCustom() {
@@ -124,6 +126,17 @@ private JButton createStyledButton(String text) {
     button.setForeground(Color.WHITE);
     button.setFocusPainted(false);
     button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+        public void mouseEntered(java.awt.event.MouseEvent evt) {
+            button.setBackground(new java.awt.Color(0, 105, 217));
+            button.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        }
+
+        public void mouseExited(java.awt.event.MouseEvent evt) {
+            button.setBackground(text.equals("CANCELAR") ? new java.awt.Color(255, 99, 71) : new java.awt.Color(0, 123, 255));
+            button.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        }
+    });
     return button;
 }
 
