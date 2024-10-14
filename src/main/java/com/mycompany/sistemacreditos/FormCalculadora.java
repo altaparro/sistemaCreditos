@@ -4,18 +4,31 @@
  */
 package com.mycompany.sistemacreditos;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 public class FormCalculadora extends javax.swing.JFrame {
+    private JLabel logoLabel;
 
     public FormCalculadora() {
-        initComponents();
+        initComponentsCustom();
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         Creditos objetoCreditos = new Creditos();
@@ -23,6 +36,123 @@ public class FormCalculadora extends javax.swing.JFrame {
         ImageIcon icon = new ImageIcon("icono.png"); // Cambia la ruta según tu estructura de proyecto
         setIconImage(icon.getImage());
     }
+    
+private void initComponentsCustom() {
+    jLabel1 = new JLabel();
+    planPagosComboBox = new JComboBox<>();
+    jLabel2 = new JLabel();
+    jLabel3 = new JLabel();
+    importeTxt = new JTextField(15); // Ancho más amplio
+    jLabel4 = new JLabel();
+    importeCuotaTxt = new JTextField(15); // Ancho más amplio
+    logoLabel = new JLabel();
+
+    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    getContentPane().setBackground(new Color(240, 240, 240));
+    
+    // Crear un JPanel con un borde y agregarlo al JFrame
+    JPanel panel = new JPanel();
+    panel.setLayout(new GridBagLayout());
+    panel.setBackground(new Color(240, 240, 240));
+    panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30)); // Espacio de 30px en todos los bordes
+
+    // Configuración de la etiqueta principal
+    jLabel1.setFont(new Font("Segoe UI", Font.BOLD, 24));
+    jLabel1.setForeground(new Color(0, 102, 204));
+    jLabel1.setHorizontalAlignment(SwingConstants.CENTER);
+    jLabel1.setText("CALCULADORA DE CREDITOS");
+
+    // Configuración del logo
+    logoLabel.setIcon(new ImageIcon("logo.png")); // Asegúrate de que la ruta sea correcta
+
+    // Usar GridBagLayout para agregar componentes
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.insets = new Insets(10, 10, 10, 10); // Espaciado entre componentes
+    gbc.fill = GridBagConstraints.HORIZONTAL; // Alinear horizontalmente
+
+    // Añadir logo centrado
+    gbc.gridx = 0;
+    gbc.gridy = 0;
+    gbc.gridwidth = 2; // El logo ocupa 2 columnas
+    gbc.anchor = GridBagConstraints.CENTER; // Centrar el logo
+    panel.add(logoLabel, gbc);
+
+    // Título
+    gbc.gridx = 0;
+    gbc.gridy = 1;
+    gbc.gridwidth = 2; // Centrar el título
+    gbc.anchor = GridBagConstraints.CENTER; // Centrar el texto
+    panel.add(jLabel1, gbc);
+
+    // Etiqueta y campo de texto para importe
+    jLabel2.setText("Importe:");
+    gbc.gridx = 0;
+    gbc.gridy = 2;
+    gbc.gridwidth = 1; // Usar 1 columna
+    gbc.anchor = GridBagConstraints.WEST; // Alinear a la izquierda
+    panel.add(jLabel2, gbc);
+
+    gbc.gridx = 1;
+    gbc.gridy = 2; 
+    panel.add(importeTxt, gbc);
+
+    // Etiqueta y comboBox para plan de pagos
+    jLabel3.setText("Plan de Pagos:");
+    gbc.gridx = 0;
+    gbc.gridy = 3;
+    panel.add(jLabel3, gbc);
+
+    gbc.gridx = 1;
+    gbc.gridy = 3;
+    panel.add(planPagosComboBox, gbc);
+
+    // Etiqueta y campo de texto para importe de cuota
+    jLabel4.setText("Importe de Cuota:");
+    gbc.gridx = 0;
+    gbc.gridy = 4;
+    panel.add(jLabel4, gbc);
+
+    gbc.gridx = 1;
+    gbc.gridy = 4; 
+    panel.add(importeCuotaTxt, gbc);
+
+    // Botón calcular usando el método createStyledButton
+    calcularBtn = createStyledButton("CALCULAR"); // Usar el método para crear el botón
+    gbc.gridx = 1;
+    gbc.gridy = 5;
+    gbc.anchor = GridBagConstraints.EAST; // Alinear el botón a la derecha
+    panel.add(calcularBtn, gbc);
+
+    // Agregar el panel al JFrame
+    add(panel);
+    
+    // Ajustar el tamaño de la ventana
+    pack();
+    setLocationRelativeTo(null); // Centrar la ventana en la pantalla
+}
+
+private JButton createStyledButton(String text) {
+    JButton button = new JButton(text);
+    button.setBackground(new java.awt.Color(30, 144, 255));
+    button.setForeground(Color.WHITE);
+    button.setFocusPainted(false);
+    button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+    button.addMouseListener(new java.awt.event.MouseAdapter() {
+        public void mouseEntered(java.awt.event.MouseEvent evt) {
+            button.setBackground(new java.awt.Color(0, 105, 217));
+            button.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        }
+
+        public void mouseExited(java.awt.event.MouseEvent evt) {
+            button.setBackground(new java.awt.Color(30, 144, 255));
+            button.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        }
+    });
+    return button;
+}
+
+
+
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

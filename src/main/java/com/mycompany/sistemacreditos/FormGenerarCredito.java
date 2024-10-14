@@ -27,131 +27,156 @@ public class FormGenerarCredito extends javax.swing.JFrame {
         setLocationRelativeTo(null);
         Creditos objetoCreditos = new Creditos();
         objetoCreditos.LlenarPlanPagoComboBox(planPagoComboBox);
-                ImageIcon icon = new ImageIcon("icono.png"); // Cambia la ruta según tu estructura de proyecto
+        ImageIcon icon = new ImageIcon("icono.png"); // Cambia la ruta según tu estructura de proyecto
         setIconImage(icon.getImage());
     }
-    
+
     private void initComponentsCustom() {
-    setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-    setTitle("Sistema de Créditos - Deportes 7");
-    getContentPane().setBackground(new java.awt.Color(240, 240, 240));
-    setLayout(new java.awt.GridBagLayout());
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Sistema de Créditos - Deportes 7");
+        getContentPane().setBackground(new java.awt.Color(240, 240, 240));
+        setLayout(new java.awt.GridBagLayout());
 
-    // Panel para el logo y el título
-    JPanel titlePanel = new JPanel(new GridBagLayout());
-    titlePanel.setOpaque(false);
+        // Panel para el logo y el título
+        JPanel titlePanel = new JPanel(new GridBagLayout());
+        titlePanel.setOpaque(false);
 
-    // Añadir logo
-    ImageIcon logoIcon = new ImageIcon("logo.png");
-    Image scaledImage = logoIcon.getImage().getScaledInstance(283, 66, Image.SCALE_SMOOTH);
-    JLabel logoLabel = new JLabel(new ImageIcon(scaledImage));
-    titlePanel.add(logoLabel, createGridBagConstraints(0, 0, 1, 1, GridBagConstraints.CENTER));
+        // Añadir logo
+        ImageIcon logoIcon = new ImageIcon("logo.png");
+        Image scaledImage = logoIcon.getImage().getScaledInstance(283, 66, Image.SCALE_SMOOTH);
+        JLabel logoLabel = new JLabel(new ImageIcon(scaledImage));
+        titlePanel.add(logoLabel, createGridBagConstraints(0, 0, 1, 1, GridBagConstraints.CENTER));
 
-    // Configuración del título
-    JLabel titleLabel = new JLabel("GENERAR CRÉDITO");
-    titleLabel.setFont(new java.awt.Font("Segoe UI", Font.BOLD, 24));
-    titleLabel.setForeground(new java.awt.Color(0, 102, 204));
-    titlePanel.add(titleLabel, createGridBagConstraints(0, 1, 1, 1, GridBagConstraints.CENTER));
+        // Configuración del título
+        JLabel titleLabel = new JLabel("GENERAR CRÉDITO");
+        titleLabel.setFont(new java.awt.Font("Segoe UI", Font.BOLD, 24));
+        titleLabel.setForeground(new java.awt.Color(0, 102, 204));
+        titlePanel.add(titleLabel, createGridBagConstraints(0, 1, 1, 1, GridBagConstraints.CENTER));
 
-    add(titlePanel, createGridBagConstraints(0, 0, 3, 1, GridBagConstraints.CENTER));
+        add(titlePanel, createGridBagConstraints(0, 0, 3, 1, GridBagConstraints.CENTER));
 
-    // Panel para el contenido del formulario
-    JPanel formPanel = new JPanel(new GridBagLayout());
-    formPanel.setOpaque(false);
-    formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // Espaciado
+        // Panel para el contenido del formulario
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setOpaque(false);
+        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // Espaciado
 
-    // Componentes del formulario
-    buscarTxt = new javax.swing.JTextField(15);
-    btnBuscar = createStyledButton("BUSCAR");
-    btnBuscar.addActionListener(evt -> btnBuscarActionPerformed(evt));
+        // Componentes del formulario
+        buscarTxt = new javax.swing.JTextField(15);
+        btnBuscar = createStyledButton("BUSCAR");
+        btnBuscar.addActionListener(evt -> btnBuscarActionPerformed(evt));
 
-    jLabel2 = new javax.swing.JLabel("DATOS CLIENTE:");
-    jLabel3 = new javax.swing.JLabel("DNI:");
-    dniTxt = new javax.swing.JTextField(15);
-    dniTxt.setEditable(false);
+        jLabel2 = new javax.swing.JLabel("DATOS CLIENTE:");
+        jLabel3 = new javax.swing.JLabel("DNI:");
+        dniTxt = new javax.swing.JTextField(15);
+        dniTxt.setEditable(false);
 
-    jLabel4 = new javax.swing.JLabel("NOMBRES:");
-    nombresTxt = new javax.swing.JTextField(15);
-    nombresTxt.setEditable(false);
+        jLabel4 = new javax.swing.JLabel("NOMBRES:");
+        nombresTxt = new javax.swing.JTextField(15);
+        nombresTxt.setEditable(false);
 
-    jLabel5 = new javax.swing.JLabel("APELLIDO:");
-    apellidoTxt = new javax.swing.JTextField(15);
-    apellidoTxt.setEditable(false);
+        jLabel5 = new javax.swing.JLabel("APELLIDO:");
+        apellidoTxt = new javax.swing.JTextField(15);
+        apellidoTxt.setEditable(false);
 
-    jLabel6 = new javax.swing.JLabel("OBSERVACIONES:");
-    observacionesText = new javax.swing.JTextPane();
-    JScrollPane observacionesScroll = new JScrollPane(observacionesText);
-    observacionesScroll.setPreferredSize(new Dimension(300, 100));
+        jLabel6 = new javax.swing.JLabel("OBSERVACIONES:");
+        observacionesText = new javax.swing.JTextPane();
+        JScrollPane observacionesScroll = new JScrollPane(observacionesText);
+        observacionesScroll.setPreferredSize(new Dimension(300, 100));
 
-    jLabel7 = new javax.swing.JLabel("PLAN DE PAGO:");
-    planPagoComboBox = new javax.swing.JComboBox<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" });
+        jLabel7 = new javax.swing.JLabel("PLAN DE PAGO:");
+        planPagoComboBox = new javax.swing.JComboBox<>(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"});
 
-    jLabel8 = new javax.swing.JLabel("MONTO:");
-    montoTxt = new javax.swing.JTextField(15);
+        jLabel8 = new javax.swing.JLabel("MONTO:");
+        montoTxt = new javax.swing.JTextField(15);
 
-    jButton2 = createStyledButton("GENERAR CREDITO");
-    jButton2.addActionListener(evt -> jButton2ActionPerformed(evt));
+        jButton2 = createStyledButton("GENERAR CREDITO");
+        jButton2.addActionListener(evt -> jButton2ActionPerformed(evt));
 
-    // Agregar componentes al panel del formulario
-    GridBagConstraints gbc = new GridBagConstraints();
-    gbc.insets = new Insets(10, 10, 10, 10);
-    gbc.anchor = GridBagConstraints.WEST;
+        // Agregar componentes al panel del formulario
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.anchor = GridBagConstraints.WEST;
 
-    gbc.gridx = 0; gbc.gridy = 0; formPanel.add(buscarTxt, gbc);
-    gbc.gridx = 1; formPanel.add(btnBuscar, gbc);
-    gbc.gridx = 0; gbc.gridy = 1; formPanel.add(jLabel2, gbc);
-    gbc.gridx = 0; gbc.gridy = 2; formPanel.add(jLabel3, gbc);
-    gbc.gridx = 1; formPanel.add(dniTxt, gbc);
-    gbc.gridx = 0; gbc.gridy = 3; formPanel.add(jLabel4, gbc);
-    gbc.gridx = 1; formPanel.add(nombresTxt, gbc);
-    gbc.gridx = 0; gbc.gridy = 4; formPanel.add(jLabel5, gbc);
-    gbc.gridx = 1; formPanel.add(apellidoTxt, gbc);
-    gbc.gridx = 0; gbc.gridy = 5; formPanel.add(jLabel6, gbc);
-    gbc.gridx = 1; formPanel.add(observacionesScroll, gbc);
-    gbc.gridx = 0; gbc.gridy = 6; formPanel.add(jLabel7, gbc);
-    gbc.gridx = 1; formPanel.add(planPagoComboBox, gbc);
-    gbc.gridx = 0; gbc.gridy = 7; formPanel.add(jLabel8, gbc);
-    gbc.gridx = 1; formPanel.add(montoTxt, gbc);
-    gbc.gridx = 0; gbc.gridy = 8; gbc.gridwidth = 2; formPanel.add(jButton2, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        formPanel.add(buscarTxt, gbc);
+        gbc.gridx = 1;
+        formPanel.add(btnBuscar, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        formPanel.add(jLabel2, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        formPanel.add(jLabel3, gbc);
+        gbc.gridx = 1;
+        formPanel.add(dniTxt, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        formPanel.add(jLabel4, gbc);
+        gbc.gridx = 1;
+        formPanel.add(nombresTxt, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        formPanel.add(jLabel5, gbc);
+        gbc.gridx = 1;
+        formPanel.add(apellidoTxt, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        formPanel.add(jLabel6, gbc);
+        gbc.gridx = 1;
+        formPanel.add(observacionesScroll, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        formPanel.add(jLabel7, gbc);
+        gbc.gridx = 1;
+        formPanel.add(planPagoComboBox, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 7;
+        formPanel.add(jLabel8, gbc);
+        gbc.gridx = 1;
+        formPanel.add(montoTxt, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 8;
+        gbc.gridwidth = 2;
+        formPanel.add(jButton2, gbc);
 
-    add(formPanel, createGridBagConstraints(0, 1, 3, 1, GridBagConstraints.CENTER));
+        add(formPanel, createGridBagConstraints(0, 1, 3, 1, GridBagConstraints.CENTER));
 
-    pack();
-    setLocationRelativeTo(null);
-}
+        pack();
+        setLocationRelativeTo(null);
+    }
 
-private JButton createStyledButton(String text) {
-    JButton button = new JButton(text);
-    button.setBackground(new java.awt.Color(30, 144, 255));
-    button.setForeground(Color.WHITE);
-    button.setFocusPainted(false);
-    button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+    private JButton createStyledButton(String text) {
+        JButton button = new JButton(text);
+        button.setBackground(new java.awt.Color(30, 144, 255));
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
         button.addMouseListener(new java.awt.event.MouseAdapter() {
-        public void mouseEntered(java.awt.event.MouseEvent evt) {
-            button.setBackground(new java.awt.Color(0, 105, 217));
-            button.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(new java.awt.Color(0, 105, 217));
+                button.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+            }
 
-        public void mouseExited(java.awt.event.MouseEvent evt) {
-            button.setBackground(text.equals("CANCELAR") ? new java.awt.Color(255, 99, 71) : new java.awt.Color(0, 123, 255));
-            button.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        }
-    });
-    return button;
-}
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(text.equals("CANCELAR") ? new java.awt.Color(255, 99, 71) : new java.awt.Color(0, 123, 255));
+                button.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+            }
+        });
+        return button;
+    }
 
-private GridBagConstraints createGridBagConstraints(int gridx, int gridy, int gridwidth, int gridheight, int anchor) {
-    GridBagConstraints gbc = new GridBagConstraints();
-    gbc.gridx = gridx;
-    gbc.gridy = gridy;
-    gbc.gridwidth = gridwidth;
-    gbc.gridheight = gridheight;
-    gbc.anchor = anchor;
-    gbc.fill = GridBagConstraints.NONE;
-    gbc.insets = new Insets(10, 10, 10, 10);
-    return gbc;
-}
-
+    private GridBagConstraints createGridBagConstraints(int gridx, int gridy, int gridwidth, int gridheight, int anchor) {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = gridx;
+        gbc.gridy = gridy;
+        gbc.gridwidth = gridwidth;
+        gbc.gridheight = gridheight;
+        gbc.anchor = anchor;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(10, 10, 10, 10);
+        return gbc;
+    }
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents

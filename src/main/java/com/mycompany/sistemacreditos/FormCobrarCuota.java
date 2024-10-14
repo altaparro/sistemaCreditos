@@ -51,7 +51,6 @@ public class FormCobrarCuota extends javax.swing.JFrame {
         });
     }
 
-
     private void configurarTabla() {
         int importeActualizadoColumnIndex = 4;
         TableColumn importeActualizadoColumn = jTable1.getColumnModel().getColumn(importeActualizadoColumnIndex);
@@ -195,6 +194,11 @@ public class FormCobrarCuota extends javax.swing.JFrame {
         buscarBtn.setText("BUSCAR");
         buscarBtn.setAlignmentX(0.5F);
         buscarBtn.setBorder(null);
+        buscarBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                buscarBtnMouseEntered(evt);
+            }
+        });
         buscarBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buscarBtnActionPerformed(evt);
@@ -452,9 +456,14 @@ public class FormCobrarCuota extends javax.swing.JFrame {
     }//GEN-LAST:event_cobrarBtnActionPerformed
 
     private void cobrarBtnMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cobrarBtnMouseEntered
-       cobrarBtn.setBackground(new java.awt.Color(0, 105, 217));
-       cobrarBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        cobrarBtn.setBackground(new java.awt.Color(0, 105, 217));
+        cobrarBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
     }//GEN-LAST:event_cobrarBtnMouseEntered
+
+    private void buscarBtnMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buscarBtnMouseEntered
+        buscarBtn.setBackground(new java.awt.Color(0, 105, 217));
+        buscarBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+    }//GEN-LAST:event_buscarBtnMouseEntered
 
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
