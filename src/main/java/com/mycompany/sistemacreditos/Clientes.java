@@ -1,8 +1,8 @@
 package com.mycompany.sistemacreditos;
 
-
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,7 +14,9 @@ import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 public class Clientes {
-       public static String user_update = "";
+
+    public static String user_update = "";
+
     public void MostrarClientesGeneral(JTable tablaClientes) {
         Conexion objetoConexion = new Conexion();
 
@@ -68,9 +70,16 @@ public class Clientes {
             objetoConexion.cerrarConexion();
         }
         
-           tablaClientes.addMouseListener(new MouseAdapter() {
+                // Eliminar listener anterior si existe
+        for (MouseListener listener : tablaClientes.getMouseListeners()) {
+            tablaClientes.removeMouseListener(listener);
+        }
+        
+        tablaClientes.addMouseListener(
+                new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void mouseClicked(MouseEvent e
+            ) {
                 int fila_point = tablaClientes.rowAtPoint(e.getPoint());
                 int columna_point = 1;
 
@@ -80,8 +89,8 @@ public class Clientes {
                     detalleCliente.setVisible(true);
                 }
             }
-        });
-           
+        }
+        );
     }
 
     public void MostrarClientes(JTable tablaClientes, String filtro) {
@@ -138,6 +147,29 @@ public class Clientes {
         } finally {
             objetoConexion.cerrarConexion();
         }
+        
+                // Eliminar listener anterior si existe
+        for (MouseListener listener : tablaClientes.getMouseListeners()) {
+            tablaClientes.removeMouseListener(listener);
+        }
+        
+          tablaClientes.addMouseListener(
+                new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e
+            ) {
+                int fila_point = tablaClientes.rowAtPoint(e.getPoint());
+                int columna_point = 1;
+
+                if (fila_point > -1) {
+                    user_update = (String) modelo.getValueAt(fila_point, columna_point);
+                    DetalleCliente detalleCliente = new DetalleCliente();
+                    detalleCliente.setVisible(true);
+                }
+            }
+        }
+        );
+
     }
 
     public void InsertarCliente(JTextField dni, JTextField nombres, JTextField apellidos, JTextField localidad, JTextField barrio, JTextField calle, JTextField numero, JTextField entre_calles, JTextField email, String fecha_alta, int calificacion, JTextField cod_area1, JTextField numero1, JTextField cod_area2, JTextField numero2, JTextField cod_area3, JTextField numero3) {
