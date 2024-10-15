@@ -4,12 +4,15 @@
  */
 package com.mycompany.sistemacreditos;
 
+import static com.mycompany.sistemacreditos.Clientes.user_update;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
@@ -32,6 +35,7 @@ public class FormDeudores extends javax.swing.JFrame {
     private JScrollPane scrollPane;
     private Conexion conexion;
     private JTextField buscarTxt;
+    public static String user_update = "";
 
     public FormDeudores() {
         initComponentsCustom();
@@ -43,6 +47,8 @@ public class FormDeudores extends javax.swing.JFrame {
         ImageIcon icon = new ImageIcon("icono.png"); // Cambia la ruta según tu estructura de proyecto
         setIconImage(icon.getImage());
     }
+    
+    
 
     private void initComponentsCustom() {
         setTitle("Listado de Cuotas Vencidas");
@@ -90,6 +96,20 @@ public class FormDeudores extends javax.swing.JFrame {
         String[] columnNames = {"DNI", "APELLIDO", "NOMBRES", "NUM CREDITO", "NUM CUOTA", "FECHA VENCIMIENTO", "MONTO CUOTA"};
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
         table.setModel(model);
+                   table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int fila_point = table.rowAtPoint(e.getPoint());
+                int columna_point = 0;
+
+                if (fila_point > -1) {
+                    user_update = (String) model.getValueAt(fila_point, columna_point);
+                    FormTelefonos formTelefonos = new FormTelefonos();
+                    formTelefonos.setVisible(true);
+                    System.out.println("asdas"+ user_update);
+                }
+            }
+        });
     }
 
     private void setupTableDesign() {
