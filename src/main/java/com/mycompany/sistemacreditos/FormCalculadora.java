@@ -122,6 +122,7 @@ private void initComponentsCustom() {
     gbc.gridy = 5;
     gbc.anchor = GridBagConstraints.EAST; // Alinear el botón a la derecha
     panel.add(calcularBtn, gbc);
+    calcularBtn.addActionListener(evt -> calcularBtnActionPerformed(evt));
 
     // Agregar el panel al JFrame
     add(panel);

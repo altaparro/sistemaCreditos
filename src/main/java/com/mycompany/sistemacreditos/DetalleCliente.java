@@ -4,6 +4,12 @@
  */
 package com.mycompany.sistemacreditos;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,6 +17,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 
 public class DetalleCliente extends javax.swing.JFrame {
@@ -20,7 +31,7 @@ public class DetalleCliente extends javax.swing.JFrame {
     String user_update = "";
 
     public DetalleCliente() {
-        initComponents();
+        initComponentsCustom();
         conexion = new Conexion(); // Inicializa el objeto conexion
         user_update = Clientes.user_update;
         ImageIcon icon = new ImageIcon("icono.png"); // Cambia la ruta según tu estructura de proyecto
@@ -29,6 +40,158 @@ public class DetalleCliente extends javax.swing.JFrame {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
+    }
+
+    private void initComponentsCustom() {
+        setTitle("Editar Cliente");
+        getContentPane().setBackground(new Color(240, 240, 240));  // Fondo del formulario
+        setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);  // Espacios entre componentes
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        // Panel para el título
+        JLabel titleLabel = new JLabel("EDITAR CLIENTE");
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        titleLabel.setForeground(new Color(0, 102, 204));
+
+        gbc.gridwidth = 2;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        add(titleLabel, gbc);
+
+        // Primer fila: DNI y Email
+        gbc.gridwidth = 1;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        add(new JLabel("DNI:"), gbc);
+        gbc.gridx = 1;
+        dniTxt = new JTextField(20);
+        add(dniTxt, gbc);
+
+        gbc.gridx = 2;
+        add(new JLabel("Email:"), gbc);
+        gbc.gridx = 3;
+        emailTxt = new JTextField(20);
+        add(emailTxt, gbc);
+
+        // Segunda fila: Nombres y Teléfono 1
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        add(new JLabel("Nombres:"), gbc);
+        gbc.gridx = 1;
+        nombresTxt = new JTextField(20);
+        add(nombresTxt, gbc);
+
+        gbc.gridx = 2;
+        add(new JLabel("Teléfono 1:"), gbc);
+        gbc.gridx = 3;
+        JPanel phone1Panel = new JPanel(new BorderLayout());
+        cod1Txt = new JTextField(3);
+        tel1Txt = new JTextField(15);
+        phone1Panel.add(cod1Txt, BorderLayout.WEST);
+        phone1Panel.add(tel1Txt, BorderLayout.CENTER);
+        add(phone1Panel, gbc);
+
+        // Tercera fila: Apellido y Teléfono 2
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        add(new JLabel("Apellido:"), gbc);
+        gbc.gridx = 1;
+        apellidoTxt = new JTextField(20);
+        add(apellidoTxt, gbc);
+
+        gbc.gridx = 2;
+        add(new JLabel("Teléfono 2:"), gbc);
+        gbc.gridx = 3;
+        JPanel phone2Panel = new JPanel(new BorderLayout());
+        cod2Txt = new JTextField(3);
+        tel2Txt = new JTextField(15);
+        phone2Panel.add(cod2Txt, BorderLayout.WEST);
+        phone2Panel.add(tel2Txt, BorderLayout.CENTER);
+        add(phone2Panel, gbc);
+
+        // Cuarta fila: Localidad y Teléfono 3
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        add(new JLabel("Localidad:"), gbc);
+        gbc.gridx = 1;
+        localidadTxt = new JTextField(20);
+        add(localidadTxt, gbc);
+
+        gbc.gridx = 2;
+        add(new JLabel("Teléfono 3:"), gbc);
+        gbc.gridx = 3;
+        JPanel phone3Panel = new JPanel(new BorderLayout());
+        cod3Txt = new JTextField(3);
+        tel3Txt = new JTextField(15);
+        phone3Panel.add(cod3Txt, BorderLayout.WEST);
+        phone3Panel.add(tel3Txt, BorderLayout.CENTER);
+        add(phone3Panel, gbc);
+
+        // Quinta fila: Barrio y Calle
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        add(new JLabel("Barrio:"), gbc);
+        gbc.gridx = 1;
+        barrioTxt = new JTextField(20);
+        add(barrioTxt, gbc);
+
+        gbc.gridx = 2;
+        add(new JLabel("Calle:"), gbc);
+        gbc.gridx = 3;
+        calleTxt = new JTextField(20);
+        add(calleTxt, gbc);
+
+        // Sexta fila: Número y Entre Calles
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        add(new JLabel("Número:"), gbc);
+        gbc.gridx = 1;
+        numeroTxt = new JTextField(20);
+        add(numeroTxt, gbc);
+
+        gbc.gridx = 2;
+        add(new JLabel("Entre Calles:"), gbc);
+        gbc.gridx = 3;
+        entreCallesTxt = new JTextField(20);
+        add(entreCallesTxt, gbc);
+
+        // Botones de acción
+        gbc.gridwidth = 1;
+        gbc.gridx = 2;
+        gbc.gridy = 7;
+        actualizarBtn = createStyledButton("ACTUALIZAR");
+        add(actualizarBtn, gbc);
+        actualizarBtn.addActionListener(evt -> actualizarBtnActionPerformed(evt));
+
+        gbc.gridx = 3;
+        historicoBtn = createStyledButton("HISTORICO");
+        add(historicoBtn, gbc);
+        historicoBtn.addActionListener(evt -> historicoBtnActionPerformed(evt));
+
+        pack();  // Ajusta la ventana al contenido
+        setLocationRelativeTo(null);  // Centra la ventana
+    }
+
+    private JButton createStyledButton(String text) {
+        JButton button = new JButton(text);
+        button.setBackground(new java.awt.Color(30, 144, 255));
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(new java.awt.Color(0, 105, 217));
+                button.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+            }
+
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(new java.awt.Color(30, 144, 255));
+                button.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+            }
+        });
+        return button;
     }
 
     private void cargarDatosCliente() {
@@ -96,7 +259,7 @@ public class DetalleCliente extends javax.swing.JFrame {
             pstmt.setInt(1, id_cliente);
 
             rs = pstmt.executeQuery();
-           
+
             int count = 0;
             while (rs.next() && count < 3) {
                 switch (count) {
