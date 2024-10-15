@@ -18,6 +18,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
 public class FormListadoClientes extends javax.swing.JFrame {
+ 
 
     public FormListadoClientes() {
         initComponentsCustom();
@@ -116,6 +117,8 @@ public class FormListadoClientes extends javax.swing.JFrame {
 
         pack();
         setLocationRelativeTo(null);
+
+     
     }
 
     private GridBagConstraints createGridBagConstraints(int gridx, int gridy, int gridwidth, int gridheight, int anchor) {

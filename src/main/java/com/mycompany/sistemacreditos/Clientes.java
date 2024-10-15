@@ -1,5 +1,8 @@
 package com.mycompany.sistemacreditos;
 
+
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,7 +14,7 @@ import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 public class Clientes {
-
+       public static String user_update = "";
     public void MostrarClientesGeneral(JTable tablaClientes) {
         Conexion objetoConexion = new Conexion();
 
@@ -64,7 +67,21 @@ public class Clientes {
         } finally {
             objetoConexion.cerrarConexion();
         }
+        
+           tablaClientes.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int fila_point = tablaClientes.rowAtPoint(e.getPoint());
+                int columna_point = 1;
 
+                if (fila_point > -1) {
+                    user_update = (String) modelo.getValueAt(fila_point, columna_point);
+                    DetalleCliente detalleCliente = new DetalleCliente();
+                    detalleCliente.setVisible(true);
+                }
+            }
+        });
+           
     }
 
     public void MostrarClientes(JTable tablaClientes, String filtro) {
