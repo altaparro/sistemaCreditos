@@ -26,6 +26,8 @@ public class FormCrearCliente extends javax.swing.JFrame {
         setIconImage(icon.getImage());
     }
 
+ 
+    
     private void initComponentsCustom() {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Crear Cliente - Sistema de Créditos");
