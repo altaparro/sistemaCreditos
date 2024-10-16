@@ -42,17 +42,26 @@ public class FormTelefonos extends javax.swing.JFrame {
         }
     }
 
-    private int obtenerIdClientePorDni(Connection conn, String dni) throws SQLException {
-        String sql = "SELECT id FROM clientes WHERE dni = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, dni);
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt("id"); // Retorna el ID del cliente
-            }
+   private int obtenerIdClientePorDni(Connection conn, String dni) throws SQLException {
+    String sql = "SELECT id, nombres, apellidos, email FROM clientes WHERE dni = ?";
+    try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        pstmt.setString(1, dni);
+        ResultSet rs = pstmt.executeQuery();
+        if (rs.next()) {
+            // Asigna el email al campo emailTxt
+            String email = rs.getString("email");
+            emailTxt.setText(email);
+
+            // Asigna el nombre y apellido al labelNomYape
+            String nombre = rs.getString("nombres");
+            String apellido = rs.getString("apellidos");
+            labelNomYape.setText(nombre + " " + apellido);
+
+            return rs.getInt("id"); // Retorna el ID del cliente
         }
-        return -1; // Retorna -1 si no se encuentra el cliente
     }
+    return -1; // Retorna -1 si no se encuentra el cliente
+}
 
     private void cargarTelefonosPorId(Connection conn, int idCliente) throws SQLException {
         String sql = "SELECT cod_area, numero FROM telefonos WHERE id_cliente = ?";
@@ -97,28 +106,54 @@ public class FormTelefonos extends javax.swing.JFrame {
         telefono2Txt = new javax.swing.JTextField();
         telefono3Txt = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        emailTxt = new javax.swing.JTextField();
+        labelNomYape = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel1.setText("TELEFONO 2:");
 
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel2.setText("TELEFONO 1:");
 
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel3.setText("TELEFONO 3:");
 
+        cod1Txt.setEditable(false);
         cod1Txt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cod1TxtActionPerformed(evt);
             }
         });
 
+        cod2Txt.setEditable(false);
+
+        cod3Txt.setEditable(false);
+
+        telefonoTxt.setEditable(false);
+
+        telefono2Txt.setEditable(false);
         telefono2Txt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 telefono2TxtActionPerformed(evt);
             }
         });
 
-        jLabel4.setText("DATOS DE CONTACTO");
+        telefono3Txt.setEditable(false);
+
+        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(0, 102, 204));
+        jLabel4.setText("DATOS DE CONTACTO DEL CLIENTE:");
+
+        jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabel5.setText("EMAIL:");
+
+        emailTxt.setEditable(false);
+
+        labelNomYape.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        labelNomYape.setForeground(new java.awt.Color(0, 102, 204));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -129,31 +164,39 @@ public class FormTelefonos extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(59, 59, 59)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel3)
-                                .addComponent(jLabel1))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                             .addComponent(jLabel2))
                         .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(cod1Txt, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(cod2Txt, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(cod3Txt, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(38, 38, 38)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(telefono3Txt, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(telefono2Txt, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(telefonoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(cod1Txt, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(cod2Txt, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(cod3Txt, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(38, 38, 38)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(telefono3Txt, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(telefono2Txt, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(telefonoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(emailTxt)))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(74, 74, 74)
-                        .addComponent(jLabel4)))
-                .addContainerGap(65, Short.MAX_VALUE))
+                        .addGap(14, 14, 14)
+                        .addComponent(jLabel4)
+                        .addGap(18, 18, 18)
+                        .addComponent(labelNomYape)))
+                .addContainerGap(111, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(29, 29, 29)
-                .addComponent(jLabel4)
-                .addGap(46, 46, 46)
+                .addGap(22, 22, 22)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(labelNomYape))
+                .addGap(53, 53, 53)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cod1Txt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(telefonoTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -168,7 +211,11 @@ public class FormTelefonos extends javax.swing.JFrame {
                     .addComponent(cod3Txt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(telefono3Txt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3))
-                .addContainerGap(68, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(emailTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(19, Short.MAX_VALUE))
         );
 
         pack();
@@ -221,10 +268,13 @@ public class FormTelefonos extends javax.swing.JFrame {
     private javax.swing.JTextField cod1Txt;
     private javax.swing.JTextField cod2Txt;
     private javax.swing.JTextField cod3Txt;
+    private javax.swing.JTextField emailTxt;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel labelNomYape;
     private javax.swing.JTextField telefono2Txt;
     private javax.swing.JTextField telefono3Txt;
     private javax.swing.JTextField telefonoTxt;

@@ -198,6 +198,9 @@ public class FormCobrarCuota extends javax.swing.JFrame {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 buscarBtnMouseEntered(evt);
             }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                buscarBtnMouseExited(evt);
+            }
         });
         buscarBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -227,6 +230,9 @@ public class FormCobrarCuota extends javax.swing.JFrame {
         cobrarBtn.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 cobrarBtnMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                cobrarBtnMouseExited(evt);
             }
         });
         cobrarBtn.addActionListener(new java.awt.event.ActionListener() {
@@ -464,6 +470,14 @@ public class FormCobrarCuota extends javax.swing.JFrame {
         buscarBtn.setBackground(new java.awt.Color(0, 105, 217));
         buscarBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
     }//GEN-LAST:event_buscarBtnMouseEntered
+
+    private void buscarBtnMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buscarBtnMouseExited
+         buscarBtn.setBackground(new java.awt.Color(30, 144, 255));
+    }//GEN-LAST:event_buscarBtnMouseExited
+
+    private void cobrarBtnMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cobrarBtnMouseExited
+         cobrarBtn.setBackground(new java.awt.Color(30, 144, 255));
+    }//GEN-LAST:event_cobrarBtnMouseExited
 
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {

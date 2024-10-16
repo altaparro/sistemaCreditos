@@ -22,213 +22,214 @@ public class FormCrearCliente extends javax.swing.JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setSize(1150, 600);
-                ImageIcon icon = new ImageIcon("icono.png"); // Cambia la ruta según tu estructura de proyecto
+        ImageIcon icon = new ImageIcon("icono.png"); // Cambia la ruta según tu estructura de proyecto
         setIconImage(icon.getImage());
     }
 
-private void initComponentsCustom() {
-    setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-    setTitle("Crear Cliente - Sistema de Créditos");
-    getContentPane().setBackground(new java.awt.Color(240, 240, 240));
-    setLayout(new GridBagLayout());
+    private void initComponentsCustom() {
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Crear Cliente - Sistema de Créditos");
+        getContentPane().setBackground(new java.awt.Color(240, 240, 240));
+        setLayout(new GridBagLayout());
 
-    // Inicializar todos los campos de texto
-    dniTxt = new JTextField();
-    nombresTxt = new JTextField();
-    apellidoTxt = new JTextField();
-    emailTxt = new JTextField();
-    telefonoTxt = new JTextField();
-    telefono2Txt = new JTextField();
-    telefono3Txt = new JTextField();
-    localidadTxt = new JTextField();
-    barrioTxt = new JTextField();
-    calleTxt = new JTextField();
-    numeroTxt = new JTextField();
-    entreCallesTxt = new JTextField();
-    cod1Txt = new JTextField();
-    cod2Txt = new JTextField();
-    cod3Txt = new JTextField();
+        // Inicializar todos los campos de texto
+        dniTxt = new JTextField();
+        nombresTxt = new JTextField();
+        apellidoTxt = new JTextField();
+        emailTxt = new JTextField();
+        telefonoTxt = new JTextField();
+        telefono2Txt = new JTextField();
+        telefono3Txt = new JTextField();
+        localidadTxt = new JTextField();
+        barrioTxt = new JTextField();
+        calleTxt = new JTextField();
+        numeroTxt = new JTextField();
+        entreCallesTxt = new JTextField();
+        cod1Txt = new JTextField();
+        cod2Txt = new JTextField();
+        cod3Txt = new JTextField();
 
-    // Título
-    JLabel titleLabel = new JLabel("CREAR CLIENTE");
-    titleLabel.setFont(new java.awt.Font("Segoe UI", Font.BOLD, 24));
-    titleLabel.setForeground(new java.awt.Color(0, 102, 204));
-    add(titleLabel, createGridBagConstraints(0, 0, 4, 1, GridBagConstraints.CENTER));
+        // Título
+        JLabel titleLabel = new JLabel("CREAR CLIENTE");
+        titleLabel.setFont(new java.awt.Font("Segoe UI", Font.BOLD, 24));
+        titleLabel.setForeground(new java.awt.Color(0, 102, 204));
+        add(titleLabel, createGridBagConstraints(0, 0, 4, 1, GridBagConstraints.CENTER));
 
-    // Panel principal para contener las dos columnas
-    JPanel mainPanel = new JPanel(new GridBagLayout());
-    mainPanel.setOpaque(false);
+        // Panel principal para contener las dos columnas
+        JPanel mainPanel = new JPanel(new GridBagLayout());
+        mainPanel.setOpaque(false);
 
-    // Panel izquierdo
-    JPanel leftPanel = new JPanel(new GridBagLayout());
-    leftPanel.setOpaque(false);
+        // Panel izquierdo
+        JPanel leftPanel = new JPanel(new GridBagLayout());
+        leftPanel.setOpaque(false);
 
-    // Panel derecho
-    JPanel rightPanel = new JPanel(new GridBagLayout());
-    rightPanel.setOpaque(false);
+        // Panel derecho
+        JPanel rightPanel = new JPanel(new GridBagLayout());
+        rightPanel.setOpaque(false);
 
-    // Campos de la izquierda
-    String[] leftLabels = {"DNI:", "NOMBRES:", "APELLIDO:", "EMAIL:", "LOCALIDAD:"};
-    JTextField[] leftFields = {dniTxt, nombresTxt, apellidoTxt, emailTxt, localidadTxt};
+        // Campos de la izquierda
+        String[] leftLabels = {"DNI:", "NOMBRES:", "APELLIDO:", "EMAIL:"};
+        JTextField[] leftFields = {dniTxt, nombresTxt, apellidoTxt, emailTxt};
 
-    addFieldsToPanel(leftPanel, leftLabels, leftFields);
+        addFieldsToPanel(leftPanel, leftLabels, leftFields);
 
-    // Campos de la derecha
-    String[] rightLabels = {"BARRIO:", "CALLE:", "NÚMERO:", "ENTRE CALLES:"};
-    JTextField[] rightFields = {barrioTxt, calleTxt, numeroTxt, entreCallesTxt};
+        // Campos de la derecha, con LOCALIDAD arriba de BARRIO
+        String[] rightLabels = {"LOCALIDAD:", "BARRIO:", "CALLE:", "NÚMERO:", "ENTRE CALLES:"};
+        JTextField[] rightFields = {localidadTxt, barrioTxt, calleTxt, numeroTxt, entreCallesTxt};
 
-    addFieldsToPanel(rightPanel, rightLabels, rightFields);
+        addFieldsToPanel(rightPanel, rightLabels, rightFields);
 
-    // Añadir paneles izquierdo y derecho al panel principal
-    GridBagConstraints gbc = new GridBagConstraints();
-    gbc.gridx = 0;
-    gbc.gridy = 0;
-    gbc.weightx = 1;
-    gbc.weighty = 1;
-    gbc.fill = GridBagConstraints.BOTH;
-    gbc.insets = new Insets(10, 10, 10, 10);
-    mainPanel.add(leftPanel, gbc);
-
-    gbc.gridx = 1;
-    mainPanel.add(rightPanel, gbc);
-
-    // Añadir el panel principal al formulario
-    add(mainPanel, createGridBagConstraints(0, 1, 4, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH));
-
-    // Panel para los campos de teléfono
-    JPanel phonePanel = new JPanel(new GridBagLayout());
-    phonePanel.setOpaque(false);
-
-    // Campos de teléfono y código de área
-    String[] phoneLabels = {"TELÉFONO:", "TELÉFONO 2:", "TELÉFONO 3:"};
-    JTextField[] phoneFields = {telefonoTxt, telefono2Txt, telefono3Txt};
-    JTextField[] codeFields = {cod1Txt, cod2Txt, cod3Txt};
-
-    addPhoneFieldsToPanel(phonePanel, phoneLabels, phoneFields, codeFields);
-
-    // Añadir el panel de teléfonos al formulario
-    add(phonePanel, createGridBagConstraints(0, 2, 4, 1, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL));
-
-    // Botones
-    confirmarBtn = createStyledButton("CONFIRMAR");
-    cancelarBtn = createStyledButton("CANCELAR");
-    
-    // Añadir ActionListeners a los botones
-    confirmarBtn.addActionListener(new java.awt.event.ActionListener() {
-        public void actionPerformed(java.awt.event.ActionEvent evt) {
-            confirmarBtnActionPerformed(evt);
-        }
-    });
-    
-    cancelarBtn.addActionListener(new java.awt.event.ActionListener() {
-        public void actionPerformed(java.awt.event.ActionEvent evt) {
-            cancelarBtnActionPerformed(evt);
-        }
-    });
-    
-    JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
-    buttonPanel.setOpaque(false);
-    buttonPanel.add(confirmarBtn);
-    buttonPanel.add(cancelarBtn);
-    
-    add(buttonPanel, createGridBagConstraints(0, 3, 4, 1, GridBagConstraints.CENTER));
-
-    pack();
-    setLocationRelativeTo(null);
-}
-
-private void addFieldsToPanel(JPanel panel, String[] labels, JTextField[] fields) {
-    GridBagConstraints gbc = new GridBagConstraints();
-    gbc.anchor = GridBagConstraints.WEST;
-    gbc.insets = new Insets(5, 5, 5, 5);
-
-    for (int i = 0; i < labels.length; i++) {
+        // Añadir paneles izquierdo y derecho al panel principal
+        GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = i;
-        JLabel label = new JLabel(labels[i]);
-        label.setFont(new java.awt.Font("Segoe UI", Font.BOLD, 14));
-        panel.add(label, gbc);
+        gbc.gridy = 0;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(10, 10, 10, 10);
+        mainPanel.add(leftPanel, gbc);
 
         gbc.gridx = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1.0;
-        JTextField field = fields[i];
-        field.setPreferredSize(new java.awt.Dimension(200, 30));
-        panel.add(field, gbc);
-    }
-}
+        mainPanel.add(rightPanel, gbc);
 
-private void addPhoneFieldsToPanel(JPanel panel, String[] labels, JTextField[] phoneFields, JTextField[] codeFields) {
-    GridBagConstraints gbc = new GridBagConstraints();
-    gbc.anchor = GridBagConstraints.WEST;
-    gbc.insets = new Insets(5, 5, 5, 5);
+        // Añadir el panel principal al formulario
+        add(mainPanel, createGridBagConstraints(0, 1, 4, 1, GridBagConstraints.CENTER, GridBagConstraints.BOTH));
 
-    for (int i = 0; i < labels.length; i++) {
-        gbc.gridx = 0;
-        gbc.gridy = i;
-        JLabel label = new JLabel(labels[i]);
-        label.setFont(new java.awt.Font("Segoe UI", Font.BOLD, 14));
-        panel.add(label, gbc);
-
-        gbc.gridx = 1;
-        JPanel phonePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        // Panel para los campos de teléfono
+        JPanel phonePanel = new JPanel(new GridBagLayout());
         phonePanel.setOpaque(false);
 
-        JLabel codeLabel = new JLabel("Cód. Área:");
-        codeLabel.setFont(new java.awt.Font("Segoe UI", Font.PLAIN, 12));
-        phonePanel.add(codeLabel);
+        // Campos de teléfono y código de área
+        String[] phoneLabels = {"TELÉFONO:", "TELÉFONO 2:", "TELÉFONO 3:"};
+        JTextField[] phoneFields = {telefonoTxt, telefono2Txt, telefono3Txt};
+        JTextField[] codeFields = {cod1Txt, cod2Txt, cod3Txt};
 
-        JTextField codeField = codeFields[i];
-        codeField.setPreferredSize(new java.awt.Dimension(60, 30));
-        phonePanel.add(codeField);
+        addPhoneFieldsToPanel(phonePanel, phoneLabels, phoneFields, codeFields);
 
-        JTextField phoneField = phoneFields[i];
-        phoneField.setPreferredSize(new java.awt.Dimension(140, 30));
-        phonePanel.add(phoneField);
+        // Añadir el panel de teléfonos al formulario
+        add(phonePanel, createGridBagConstraints(0, 2, 4, 1, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL));
 
-        panel.add(phonePanel, gbc);
+        // Botones
+        confirmarBtn = createStyledButton("CONFIRMAR");
+        cancelarBtn = createStyledButton("CANCELAR");
+
+        // Añadir ActionListeners a los botones
+        confirmarBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                confirmarBtnActionPerformed(evt);
+            }
+        });
+
+        cancelarBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelarBtnActionPerformed(evt);
+            }
+        });
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
+        buttonPanel.setOpaque(false);
+        buttonPanel.add(confirmarBtn);
+        buttonPanel.add(cancelarBtn);
+
+        add(buttonPanel, createGridBagConstraints(0, 3, 4, 1, GridBagConstraints.CENTER));
+
+        pack();
+        setLocationRelativeTo(null);
     }
-}
 
-private JButton createStyledButton(String text) {
-    JButton button = new JButton(text);
-    button.setFont(new java.awt.Font("Segoe UI", Font.BOLD, 14));
-    button.setForeground(java.awt.Color.WHITE);
-    button.setBackground(text.equals("CANCELAR") ? new java.awt.Color(255, 99, 71) : new java.awt.Color(0, 123, 255));
-    button.setFocusPainted(false);
-    button.setBorderPainted(false);
-    button.setPreferredSize(new java.awt.Dimension(130, 40));
+    private void addFieldsToPanel(JPanel panel, String[] labels, JTextField[] fields) {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
 
-    button.addMouseListener(new java.awt.event.MouseAdapter() {
-        public void mouseEntered(java.awt.event.MouseEvent evt) {
-            button.setBackground(new java.awt.Color(0, 105, 217));
-            button.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        for (int i = 0; i < labels.length; i++) {
+            gbc.gridx = 0;
+            gbc.gridy = i;
+            JLabel label = new JLabel(labels[i]);
+            label.setFont(new java.awt.Font("Segoe UI", Font.BOLD, 14));
+            panel.add(label, gbc);
+
+            gbc.gridx = 1;
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            gbc.weightx = 1.0;
+            JTextField field = fields[i];
+            field.setPreferredSize(new java.awt.Dimension(200, 30));
+            panel.add(field, gbc);
         }
+    }
 
-        public void mouseExited(java.awt.event.MouseEvent evt) {
-            button.setBackground(text.equals("CANCELAR") ? new java.awt.Color(255, 99, 71) : new java.awt.Color(0, 123, 255));
-            button.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+    private void addPhoneFieldsToPanel(JPanel panel, String[] labels, JTextField[] phoneFields, JTextField[] codeFields) {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+
+        for (int i = 0; i < labels.length; i++) {
+            gbc.gridx = 0;
+            gbc.gridy = i;
+            JLabel label = new JLabel(labels[i]);
+            label.setFont(new java.awt.Font("Segoe UI", Font.BOLD, 14));
+            panel.add(label, gbc);
+
+            gbc.gridx = 1;
+            JPanel phonePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+            phonePanel.setOpaque(false);
+
+            JLabel codeLabel = new JLabel("Cód. Área:");
+            codeLabel.setFont(new java.awt.Font("Segoe UI", Font.PLAIN, 12));
+            phonePanel.add(codeLabel);
+
+            JTextField codeField = codeFields[i];
+            codeField.setPreferredSize(new java.awt.Dimension(60, 30));
+            phonePanel.add(codeField);
+
+            JTextField phoneField = phoneFields[i];
+            phoneField.setPreferredSize(new java.awt.Dimension(140, 30));
+            phonePanel.add(phoneField);
+
+            panel.add(phonePanel, gbc);
         }
-    });
+    }
 
-    return button;
-}
+    private JButton createStyledButton(String text) {
+        JButton button = new JButton(text);
+        button.setFont(new java.awt.Font("Segoe UI", Font.BOLD, 14));
+        button.setForeground(java.awt.Color.WHITE);
+        button.setBackground(text.equals("CANCELAR") ? new java.awt.Color(255, 99, 71) : new java.awt.Color(0, 123, 255));
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        button.setPreferredSize(new java.awt.Dimension(130, 40));
 
-private GridBagConstraints createGridBagConstraints(int gridx, int gridy, int gridwidth, int gridheight, int anchor) {
-    return createGridBagConstraints(gridx, gridy, gridwidth, gridheight, anchor, GridBagConstraints.NONE);
-}
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(new java.awt.Color(0, 105, 217));
+                button.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+            }
 
-private GridBagConstraints createGridBagConstraints(int gridx, int gridy, int gridwidth, int gridheight, int anchor, int fill) {
-    GridBagConstraints gbc = new GridBagConstraints();
-    gbc.gridx = gridx;
-    gbc.gridy = gridy;
-    gbc.gridwidth = gridwidth;
-    gbc.gridheight = gridheight;
-    gbc.anchor = anchor;
-    gbc.fill = fill;
-    gbc.insets = new java.awt.Insets(5, 5, 5, 5);
-    return gbc;
-}
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(text.equals("CANCELAR") ? new java.awt.Color(255, 99, 71) : new java.awt.Color(0, 123, 255));
+                button.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+            }
+        });
+
+        return button;
+    }
+
+    private GridBagConstraints createGridBagConstraints(int gridx, int gridy, int gridwidth, int gridheight, int anchor) {
+        return createGridBagConstraints(gridx, gridy, gridwidth, gridheight, anchor, GridBagConstraints.NONE);
+    }
+
+    private GridBagConstraints createGridBagConstraints(int gridx, int gridy, int gridwidth, int gridheight, int anchor, int fill) {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = gridx;
+        gbc.gridy = gridy;
+        gbc.gridwidth = gridwidth;
+        gbc.gridheight = gridheight;
+        gbc.anchor = anchor;
+        gbc.fill = fill;
+        gbc.insets = new java.awt.Insets(5, 5, 5, 5);
+        return gbc;
+    }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {

@@ -151,6 +151,7 @@
       </Properties>
       <Events>
         <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="buscarBtnMouseEntered"/>
+        <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="buscarBtnMouseExited"/>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buscarBtnActionPerformed"/>
       </Events>
     </Component>
@@ -207,6 +208,7 @@
       </Properties>
       <Events>
         <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="cobrarBtnMouseEntered"/>
+        <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="cobrarBtnMouseExited"/>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cobrarBtnActionPerformed"/>
       </Events>
     </Component>
