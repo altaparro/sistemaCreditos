@@ -379,9 +379,5 @@ public class CobrarCuota {
             }
         }
 
-        // Mostrar el mensaje de éxito solo si todo el proceso fue exitoso
-        if (pagoExitoso) {
-            javax.swing.JOptionPane.showMessageDialog(null, "Pago procesado correctamente.");
-        }
     }
 }

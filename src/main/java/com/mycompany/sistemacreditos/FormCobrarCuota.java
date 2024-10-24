@@ -6,7 +6,6 @@ import java.awt.Font;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -440,7 +439,6 @@ public class FormCobrarCuota extends javax.swing.JFrame {
         } else if (algunPagoProcesado) {
             buscarBtnActionPerformed(null);
             updateTotalCobrar();
-            JOptionPane.showMessageDialog(this, "Todos los pagos se procesaron con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
 
             // Generar PDF después de procesar los pagos
             String dni = dniTxt.getText();
@@ -449,7 +447,6 @@ public class FormCobrarCuota extends javax.swing.JFrame {
             if (!dni.isEmpty()) {
                 try {
                     objetoCobrarCuota.generarPdf(dni, nombres, apellido);
-                    JOptionPane.showMessageDialog(this, "PDF generado con éxito: cuotas_pagadas_" + dni + ".pdf", "PDF Generado", JOptionPane.INFORMATION_MESSAGE);
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(this, "Error al generar el PDF: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }

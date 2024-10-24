@@ -1,13 +1,15 @@
 package com.mycompany.sistemacreditos;
-
 import java.time.LocalDate;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import javax.swing.JOptionPane;
 
 public class ActualizarCuotas {
@@ -19,6 +21,9 @@ public class ActualizarCuotas {
         PreparedStatement pstmtUpdate = null;
         ResultSet rs = null;
 
+        // Define el formato de fecha que usarás
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
         try {
             conexion = objetoConexion.establecerConexion();
             // SQL para obtener las cuotas donde pago_realizado = 0
@@ -29,11 +34,11 @@ public class ActualizarCuotas {
             pstmtSelect = conexion.prepareStatement(sqlSelect);
             rs = pstmtSelect.executeQuery();
 
-            // Fecha actual
+            // Fecha actual formateada
             LocalDate fechaActual = LocalDate.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy"); // Formato de la fecha DD-MM-AAAA
+            String fechaActualFormateada = fechaActual.format(dateFormatter);
 
-            // Preparar la consulta para actualizar el importe_actualizado
+            // Modificar la consulta UPDATE para usar texto en lugar de DATE
             String sqlUpdate = "UPDATE cuotas SET importe_actualizado = ?, fecha_actualizacion = ? WHERE id_cuota = ?";
 
             pstmtUpdate = conexion.prepareStatement(sqlUpdate);
@@ -43,25 +48,42 @@ public class ActualizarCuotas {
                 int idCuota = rs.getInt("id_cuota");
                 double importeActualizado = rs.getDouble("importe_actualizado");
 
-                // Parsear las fechas de vencimiento, último movimiento y última actualización
-                LocalDate fechaVencimiento = LocalDate.parse(rs.getString("vencimiento"), formatter);
-                LocalDate ultimoMov = LocalDate.parse(rs.getString("ultimo_mov"), formatter);
-                LocalDate fechaUltimaActualizacion = rs.getDate("fecha_actualizacion") != null
-                        ? rs.getDate("fecha_actualizacion").toLocalDate()
-                        : ultimoMov; // Usar último movimiento si no hay fecha de actualización previa
+                // Función auxiliar para convertir timestamp a LocalDate
+                LocalDate fechaVencimiento = convertirTimestampALocalDate(rs.getString("vencimiento"));
+                LocalDate ultimoMov = convertirTimestampALocalDate(rs.getString("ultimo_mov"));
+
+                // Obtener la fecha_actualizacion
+                LocalDate fechaActualizacion;
+                String fechaActualizacionStr = rs.getString("fecha_actualizacion");
+                if (fechaActualizacionStr != null && !fechaActualizacionStr.isEmpty()) {
+                    try {
+                        fechaActualizacion = convertirTimestampALocalDate(fechaActualizacionStr);
+                    } catch (Exception e) {
+                        fechaActualizacion = fechaActual;
+                    }
+                } else {
+                    fechaActualizacion = fechaActual;
+                }
 
                 // Comparar la fecha de vencimiento con la fecha actual
                 if (fechaVencimiento.isBefore(fechaActual)) {
-                    // Calcular el número de días de retraso desde la última actualización
-                    long diasRetraso = ChronoUnit.DAYS.between(fechaUltimaActualizacion, fechaActual);
+                    // Calcular el número de días de retraso desde la fecha de vencimiento
+                    long diasRetraso = ChronoUnit.DAYS.between(fechaVencimiento, fechaActual);
+                    System.out.println("Días de retraso para cuota ID " + idCuota + ": " + diasRetraso);
 
                     // Si hay días de retraso, aplicar una penalización del 1% por cada día de retraso
                     if (diasRetraso > 0) {
-                        double nuevoImporte = importeActualizado * Math.pow(1.01, diasRetraso);
+                        // Calcular el nuevo importe con interés compuesto
+                        BigDecimal nuevoImporte = BigDecimal.valueOf(importeActualizado)
+                                .multiply(BigDecimal.valueOf(Math.pow(1.01, diasRetraso)))
+                                .setScale(2, RoundingMode.HALF_UP);
+
+                        System.out.println("Importe original: " + importeActualizado);
+                        System.out.println("Nuevo importe calculado: " + nuevoImporte);
 
                         // Actualizar el importe_actualizado y la fecha de actualización en la base de datos
-                        pstmtUpdate.setDouble(1, nuevoImporte);
-                        pstmtUpdate.setDate(2, java.sql.Date.valueOf(fechaActual)); // Establecer la fecha actual
+                        pstmtUpdate.setDouble(1, nuevoImporte.doubleValue());
+                        pstmtUpdate.setString(2, fechaActualFormateada);
                         pstmtUpdate.setInt(3, idCuota);
                         pstmtUpdate.executeUpdate();
                     }
@@ -73,26 +95,150 @@ public class ActualizarCuotas {
         } catch (SQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, "Error al actualizar cuotas vencidas: " + e.getMessage());
-        } catch (DateTimeParseException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(null, "Error en el formato de fecha: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
         } finally {
             try {
-                if (rs != null) {
-                    rs.close();
-                }
-                if (pstmtSelect != null) {
-                    pstmtSelect.close();
-                }
-                if (pstmtUpdate != null) {
-                    pstmtUpdate.close();
-                }
-                if (conexion != null) {
-                    conexion.close();
-                }
+                if (rs != null) rs.close();
+                if (pstmtSelect != null) pstmtSelect.close();
+                if (pstmtUpdate != null) pstmtUpdate.close();
+                if (conexion != null) conexion.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
     }
+
+    private LocalDate convertirTimestampALocalDate(String timestamp) {
+        try {
+            // Primero intentamos parsear como fecha formateada
+            return LocalDate.parse(timestamp, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        } catch (Exception e) {
+            try {
+                // Si falla, intentamos convertir desde timestamp
+                long timestampLong = Long.parseLong(timestamp);
+                return Instant.ofEpochMilli(timestampLong)
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate();
+            } catch (Exception e2) {
+                // Si ambos métodos fallan, retornamos la fecha actual
+                return LocalDate.now();
+            }
+        }
+    }
 }
+
+/*
+package com.mycompany.sistemacreditos;
+import java.time.LocalDate;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import javax.swing.JOptionPane;
+
+public class ActualizarCuotas {
+
+    private static final double INTERES_DIARIO = 0.01; // 1% diario
+
+    public void actualizarCuotasVencidas() {
+        Conexion objetoConexion = new Conexion();
+        Connection conexion = null;
+        PreparedStatement pstmtSelect = null;
+        PreparedStatement pstmtUpdate = null;
+        ResultSet rs = null;
+
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+        try {
+            conexion = objetoConexion.establecerConexion();
+            String sqlSelect = "SELECT id_cuota, importe_actualizado, vencimiento, ultimo_mov, fecha_actualizacion "
+                    + "FROM cuotas "
+                    + "WHERE pago_realizado = 0";
+
+            pstmtSelect = conexion.prepareStatement(sqlSelect);
+            rs = pstmtSelect.executeQuery();
+
+            LocalDate fechaActual = LocalDate.now();
+            String fechaActualFormateada = fechaActual.format(dateFormatter);
+
+            String sqlUpdate = "UPDATE cuotas SET importe_actualizado = ?, fecha_actualizacion = ? WHERE id_cuota = ?";
+            pstmtUpdate = conexion.prepareStatement(sqlUpdate);
+
+            while (rs.next()) {
+                int idCuota = rs.getInt("id_cuota");
+                double importeOriginal = rs.getDouble("importe_actualizado"); // Este sería el importe de la cuota pura
+
+                LocalDate fechaVencimiento = convertirTimestampALocalDate(rs.getString("vencimiento"));
+
+                if (fechaVencimiento.isBefore(fechaActual)) {
+                    long diasRetraso = ChronoUnit.DAYS.between(fechaVencimiento, fechaActual);
+                    
+                    if (diasRetraso > 0) {
+                        // Cálculo de interés simple
+                        BigDecimal interes = BigDecimal.valueOf(importeOriginal)
+                                .multiply(BigDecimal.valueOf(INTERES_DIARIO))
+                                .multiply(BigDecimal.valueOf(diasRetraso));
+                        
+                        BigDecimal nuevoImporte = BigDecimal.valueOf(importeOriginal)
+                                .add(interes)
+                                .setScale(2, RoundingMode.HALF_UP);
+
+                        System.out.println("ID Cuota: " + idCuota);
+                        System.out.println("Importe original: " + importeOriginal);
+                        System.out.println("Días de retraso: " + diasRetraso);
+                        System.out.println("Interés calculado: " + interes);
+                        System.out.println("Nuevo importe calculado: " + nuevoImporte);
+
+                        pstmtUpdate.setDouble(1, nuevoImporte.doubleValue());
+                        pstmtUpdate.setString(2, fechaActualFormateada);
+                        pstmtUpdate.setInt(3, idCuota);
+                        pstmtUpdate.executeUpdate();
+                    }
+                }
+            }
+
+            JOptionPane.showMessageDialog(null, "Cuotas vencidas actualizadas correctamente.");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error al actualizar cuotas vencidas: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (pstmtSelect != null) pstmtSelect.close();
+                if (pstmtUpdate != null) pstmtUpdate.close();
+                if (conexion != null) conexion.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private LocalDate convertirTimestampALocalDate(String timestamp) {
+        try {
+            return LocalDate.parse(timestamp, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        } catch (Exception e) {
+            try {
+                long timestampLong = Long.parseLong(timestamp);
+                return Instant.ofEpochMilli(timestampLong)
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate();
+            } catch (Exception e2) {
+                return LocalDate.now();
+            }
+        }
+    }
+}
+
+*/

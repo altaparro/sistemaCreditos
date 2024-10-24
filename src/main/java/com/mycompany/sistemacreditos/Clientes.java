@@ -69,12 +69,12 @@ public class Clientes {
         } finally {
             objetoConexion.cerrarConexion();
         }
-        
-                // Eliminar listener anterior si existe
+
+        // Eliminar listener anterior si existe
         for (MouseListener listener : tablaClientes.getMouseListeners()) {
             tablaClientes.removeMouseListener(listener);
         }
-        
+
         tablaClientes.addMouseListener(
                 new MouseAdapter() {
             @Override
@@ -93,67 +93,70 @@ public class Clientes {
         );
     }
 
-    public void MostrarClientes(JTable tablaClientes, String filtro) {
-        Conexion objetoConexion = new Conexion();
-        DefaultTableModel modelo = new DefaultTableModel();
+  public void MostrarClientes(JTable tablaClientes, String filtro) {
+    Conexion objetoConexion = new Conexion();
+    DefaultTableModel modelo = new DefaultTableModel();
 
-        modelo.addColumn("ID");
-        modelo.addColumn("DNI");
-        modelo.addColumn("NOMBRES");
-        modelo.addColumn("APELLIDO");
-        modelo.addColumn("LOCALIDAD");
-        modelo.addColumn("BARRIO");
-        modelo.addColumn("CALLE");
-        modelo.addColumn("NUMERO");
-        modelo.addColumn("ENTRE CALLES");
-        modelo.addColumn("EMAIL");
-        modelo.addColumn("FECHA ALTA");
-        modelo.addColumn("CALIFICACION");
+    modelo.addColumn("ID");
+    modelo.addColumn("DNI");
+    modelo.addColumn("NOMBRES");
+    modelo.addColumn("APELLIDO");
+    modelo.addColumn("LOCALIDAD");
+    modelo.addColumn("BARRIO");
+    modelo.addColumn("CALLE");
+    modelo.addColumn("NUMERO");
+    modelo.addColumn("ENTRE CALLES");
+    modelo.addColumn("EMAIL");
+    modelo.addColumn("FECHA ALTA");
+    modelo.addColumn("CALIFICACION");
 
+    tablaClientes.setModel(modelo);
+
+    String sql = "SELECT * FROM clientes";
+
+    // Si el filtro no está vacío, agregar la condición de búsqueda
+    if (!filtro.isEmpty()) {
+        // Modificación de la consulta para buscar por nombre y apellido juntos o por separado
+        sql += " WHERE (nombres || ' ' || apellidos LIKE '%" + filtro + "%' OR apellidos || ' ' || nombres LIKE '%" + filtro + "%')";
+    }
+
+    String[] datos = new String[12];
+    Statement st;
+    try {
+        st = objetoConexion.establecerConexion().createStatement();
+        ResultSet rs = st.executeQuery(sql);
+
+        while (rs.next()) {
+            datos[0] = rs.getString(1); // ID
+            datos[1] = rs.getString(2); // DNI
+            datos[2] = rs.getString(3); // Nombres
+            datos[3] = rs.getString(4); // Apellido
+            datos[4] = rs.getString(5); // Localidad
+            datos[5] = rs.getString(6); // Barrio
+            datos[6] = rs.getString(7); // Calle
+            datos[7] = rs.getString(8); // Número
+            datos[8] = rs.getString(9); // Entre calles
+            datos[9] = rs.getString(10); // Email
+            datos[10] = rs.getString(11); // Fecha Alta
+            datos[11] = rs.getString(12); // Calificación
+            modelo.addRow(datos);
+        }
         tablaClientes.setModel(modelo);
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(null, "Error al mostrar los datos: " + e);
+        System.out.println(e);
+    } finally {
+        objetoConexion.cerrarConexion();
+    }
 
-        String sql = "SELECT * FROM clientes";
 
-        // Si el filtro no está vacío, agregar la condición de búsqueda
-        if (!filtro.isEmpty()) {
-            sql += " WHERE nombres LIKE '%" + filtro + "%' OR apellidos LIKE '%" + filtro + "%' OR dni LIKE '%" + filtro + "%'";
-        }
 
-        String[] datos = new String[12];
-        Statement st;
-        try {
-            st = objetoConexion.establecerConexion().createStatement();
-            ResultSet rs = st.executeQuery(sql);
-
-            while (rs.next()) {
-                datos[0] = rs.getString(1); // ID
-                datos[1] = rs.getString(2); // DNI
-                datos[2] = rs.getString(3); // Nombres
-                datos[3] = rs.getString(4); // Apellido
-                datos[4] = rs.getString(5); // Localidad
-                datos[5] = rs.getString(6); // Barrio
-                datos[6] = rs.getString(7); // Calle
-                datos[7] = rs.getString(8); // Número
-                datos[8] = rs.getString(9); // Entre calles
-                datos[9] = rs.getString(10); // Email
-                datos[10] = rs.getString(11); // Fecha Alta
-                datos[11] = rs.getString(12); // Calificación
-                modelo.addRow(datos);
-            }
-            tablaClientes.setModel(modelo);
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Error al mostrar los datos: " + e);
-            System.out.println(e);
-        } finally {
-            objetoConexion.cerrarConexion();
-        }
-        
-                // Eliminar listener anterior si existe
+        // Eliminar listener anterior si existe
         for (MouseListener listener : tablaClientes.getMouseListeners()) {
             tablaClientes.removeMouseListener(listener);
         }
-        
-          tablaClientes.addMouseListener(
+
+        tablaClientes.addMouseListener(
                 new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e
