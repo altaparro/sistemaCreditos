@@ -1,4 +1,5 @@
 package com.mycompany.sistemacreditos;
+
 import java.time.LocalDate;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -14,6 +15,10 @@ import javax.swing.JOptionPane;
 
 public class ActualizarCuotas {
 
+    private static final double INTERES_DIARIO = 0.01; // 1% diario
+
+    // INTERES COMPUESTO:
+    /*
     public void actualizarCuotasVencidas() {
         Conexion objetoConexion = new Conexion();
         Connection conexion = null;
@@ -128,26 +133,11 @@ public class ActualizarCuotas {
         }
     }
 }
-
-/*
-package com.mycompany.sistemacreditos;
-import java.time.LocalDate;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import javax.swing.JOptionPane;
-
-public class ActualizarCuotas {
-
-    private static final double INTERES_DIARIO = 0.01; // 1% diario
-
+    
+  // INTERES DIARIO SOBRE CUOTA PURA
+    
+    
+     */
     public void actualizarCuotasVencidas() {
         Conexion objetoConexion = new Conexion();
         Connection conexion = null;
@@ -159,7 +149,8 @@ public class ActualizarCuotas {
 
         try {
             conexion = objetoConexion.establecerConexion();
-            String sqlSelect = "SELECT id_cuota, importe_actualizado, vencimiento, ultimo_mov, fecha_actualizacion "
+            // Modificado para incluir importe_cuota
+            String sqlSelect = "SELECT id_cuota, importe_cuota, importe_actualizado, vencimiento, ultimo_mov, fecha_actualizacion "
                     + "FROM cuotas "
                     + "WHERE pago_realizado = 0";
 
@@ -174,25 +165,25 @@ public class ActualizarCuotas {
 
             while (rs.next()) {
                 int idCuota = rs.getInt("id_cuota");
-                double importeOriginal = rs.getDouble("importe_actualizado"); // Este sería el importe de la cuota pura
+                double importeCuota = rs.getDouble("importe_cuota"); // Usando importe_cuota en lugar de importe_actualizado
 
                 LocalDate fechaVencimiento = convertirTimestampALocalDate(rs.getString("vencimiento"));
 
                 if (fechaVencimiento.isBefore(fechaActual)) {
                     long diasRetraso = ChronoUnit.DAYS.between(fechaVencimiento, fechaActual);
-                    
+
                     if (diasRetraso > 0) {
-                        // Cálculo de interés simple
-                        BigDecimal interes = BigDecimal.valueOf(importeOriginal)
+                        // Cálculo de interés simple sobre el importe_cuota
+                        BigDecimal interes = BigDecimal.valueOf(importeCuota)
                                 .multiply(BigDecimal.valueOf(INTERES_DIARIO))
                                 .multiply(BigDecimal.valueOf(diasRetraso));
-                        
-                        BigDecimal nuevoImporte = BigDecimal.valueOf(importeOriginal)
+
+                        BigDecimal nuevoImporte = BigDecimal.valueOf(importeCuota)
                                 .add(interes)
                                 .setScale(2, RoundingMode.HALF_UP);
 
                         System.out.println("ID Cuota: " + idCuota);
-                        System.out.println("Importe original: " + importeOriginal);
+                        System.out.println("Importe cuota pura: " + importeCuota);
                         System.out.println("Días de retraso: " + diasRetraso);
                         System.out.println("Interés calculado: " + interes);
                         System.out.println("Nuevo importe calculado: " + nuevoImporte);
@@ -215,10 +206,18 @@ public class ActualizarCuotas {
             JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
         } finally {
             try {
-                if (rs != null) rs.close();
-                if (pstmtSelect != null) pstmtSelect.close();
-                if (pstmtUpdate != null) pstmtUpdate.close();
-                if (conexion != null) conexion.close();
+                if (rs != null) {
+                    rs.close();
+                }
+                if (pstmtSelect != null) {
+                    pstmtSelect.close();
+                }
+                if (pstmtUpdate != null) {
+                    pstmtUpdate.close();
+                }
+                if (conexion != null) {
+                    conexion.close();
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -239,6 +238,5 @@ public class ActualizarCuotas {
             }
         }
     }
-}
 
-*/
+}

@@ -203,7 +203,7 @@ public class Creditos {
         }
     }
 
-    public int insertarCredito(JTextField dni_cliente, JTextPane observacion, JTextField monto, String fecha, int id_plan_pago) {
+public int insertarCredito(JTextField dni_cliente, JTextPane observacion, JTextField monto, String fecha, int id_plan_pago) {
         Conexion objetoConexion = new Conexion();
         Connection conexion = null;
         PreparedStatement psBuscarCliente = null;
@@ -292,20 +292,48 @@ public class Creditos {
                             psInsertarCuota.setDouble(5, importeCuotaConInteres.doubleValue());
                             psInsertarCuota.setDouble(6, importeCuotaConInteres.doubleValue());
 
+                            // Nueva lógica para determinar la fecha de vencimiento
+                            if (tipo.equalsIgnoreCase("primera en el momento")) {
+                                if (i == 0) {
+                                    // Primera cuota: fecha actual
+                                    fechaVencimiento = fechaInicial;
+                                } else if (i == 1 && fechaInicial.getDayOfMonth() >= 21) {
+                                    // Segunda cuota cuando la fecha es posterior al 21: 
+                                    // vence el día 7 del mes subsiguiente (dos meses después)
+                                    fechaVencimiento = fechaInicial
+                                            .plusMonths(2)
+                                            .withDayOfMonth(7);
+                                } else if (i > 1 && fechaInicial.getDayOfMonth() >= 21) {
+                                    // Cuotas posteriores: siempre el día 7 del mes siguiente
+                                    fechaVencimiento = fechaVencimiento
+                                            .plusMonths(1)
+                                            .withDayOfMonth(7);
+                                } else {
+                                    // Para fechas anteriores al 21, mantener el comportamiento normal
+                                    fechaVencimiento = fechaVencimiento.plusMonths(1);
+                                }
+                            } else {
+                                // Lógica existente para otros tipos de planes
+                                if (fechaInicial.getDayOfMonth() >= 21) {
+                                    if (i == 0) {
+                                        fechaVencimiento = fechaInicial
+                                                .plusMonths(2)
+                                                .withDayOfMonth(7);
+                                    } else {
+                                        fechaVencimiento = fechaVencimiento
+                                                .plusMonths(1)
+                                                .withDayOfMonth(7);
+                                    }
+                                } else {
+                                    fechaVencimiento = fechaVencimiento.plusMonths(1);
+                                }
+                            }
+
                             String fechaVencimientoStr = fechaVencimiento.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
                             psInsertarCuota.setString(7, fechaVencimientoStr);
                             psInsertarCuota.setString(8, fechaVencimientoStr);
                             psInsertarCuota.setBoolean(9, tipo.equalsIgnoreCase("primera en el momento") && i == 0);
                             psInsertarCuota.executeUpdate();
-
-                            // Calcular la fecha de la siguiente cuota
-                            if (fechaInicial.getDayOfMonth() >= 21) {
-                                // Si empezó después del 21, todas las cuotas vencen el 7
-                                fechaVencimiento = fechaVencimiento.plusMonths(1).withDayOfMonth(7);
-                            } else {
-                                // Si empezó antes del 21, mantener el mismo día del mes
-                                fechaVencimiento = fechaVencimiento.plusMonths(1);
-                            }
                         }
 
                         conexion.commit();  // Confirmar transacción
