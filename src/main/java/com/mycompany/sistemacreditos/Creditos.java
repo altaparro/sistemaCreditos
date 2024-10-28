@@ -203,7 +203,7 @@ public class Creditos {
         }
     }
 
-public int insertarCredito(JTextField dni_cliente, JTextPane observacion, JTextField monto, String fecha, int id_plan_pago) {
+    public int insertarCredito(JTextField dni_cliente, JTextPane observacion, JTextField monto, String fecha, int id_plan_pago) {
         Conexion objetoConexion = new Conexion();
         Connection conexion = null;
         PreparedStatement psBuscarCliente = null;
